@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>ChaacImpact | Simulador Real</title>
+
+  <!-- CesiumJS -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.118/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.118/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+
+  <!-- Estilos -->
+  <style>
+    html, body, #cesiumContainer { width:100%; height:100%; margin:0; padding:0; overflow:hidden; background:#000; }
+    body { font-family: 'Montserrat', sans-serif; }
+
+    /* PANEL lateral */
+    #panel {
+      position: absolute;
+      top: 0; right: 0;
+      width: 300px;
+      height: 100%;
+      background: rgba(10, 10, 25, 0.95);
+      color: #fff;
+      padding: 25px;
+      overflow-y: auto;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+    }
+    h2 {
+      font-size: 20px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    #modeloAsteroide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px 0;
+    }
+    #modeloAsteroide img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 10px #aaa);
+    }
+    label {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #bfe1ff;
+    }
+    .barra {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      position: relative;
+      margin-top: 5px;
+    }
+    .relleno {
+      height: 6px;
+      background: linear-gradient(90deg,#00c0ff,#0078ff);
+      border-radius: 3px;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(90deg,#0078ff,#00c0ff);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    button:hover { opacity: 0.9; }
+    #resultados {
+      max-height: 140px;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+    .asteroid-item {
+      padding: 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+    }
+    .asteroid-item:hover { background: rgba(255,255,255,0.15); }
+  </style>
+</head>
+<body>
+
+<div id="cesiumContainer"></div>
+
+<!-- Panel lateral -->
+<div id="panel">
+  <h2>ASTEROID<br>LAUNCHER</h2>
+
+  <input id="busqueda" type="text" placeholder="Buscar asteroide (ej. Apophis)">
+  <button id="buscarBtn">Buscar</button>
+
+  <div id="resultados"></div>
+
+  <div id="modeloAsteroide">
+    <img id="imgAst" src="https://cdn-icons-png.flaticon.com/512/5644/5644909.png" alt="Asteroide">
+    <div id="nombreAst">Selecciona un asteroide</div>
+  </div>
+
+  <label>Diameter: <span id="diamVal">–</span> m</label>
+  <div class="barra"><div class="relleno" id="barDiam"></div></div>
+
+  <label>Speed: <span id="velVal">–</span> km/s</label>
+  <div class="barra"><div class="relleno" id="barVel"></div></div>
+
+  <label>Impact angle: <span id="angVal">45°</span></label>
+  <div class="barra"><div class="relleno" id="barAng"></div></div>
+
+  <button id="simularBtn" disabled>SIMULAR IMPACTO</button>
+</div>
+
+<!-- Sonido -->
+<audio id="boomSound" src="https://cdn.pixabay.com/audio/2022/10/27/audio_29919e9c77.mp3"></audio>
+
+<script>
+  // CONFIG
+  const NASA_KEY = "Nxvxz1N0ARXVVH9oNBdI8uQXtZiF9pLTdhIxD29B"; // ← reemplaza con tu key
+  Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5NmY5ZDA2Yi0zMzliLTRkOTEtYTYyYS05YTQ0NjQxYzMxNmMiLCJpZCI6MzQ4MzgxLCJpYXQiOjE3NTk5MzI3NDB9.RAB3s6EwdShkIYv8LKHz7SjfB_THmMtcmIvwDC_g3IA";
+
+  const viewer = new Cesium.Viewer('cesiumContainer', { terrain: Cesium.Terrain.fromWorldTerrain() });
+  let selectedCoords = null;
+  let asteroideSeleccionado = null;
+
+  // Búsqueda
+  async function buscarAsteroides(nombre) {
+    const res = await fetch(`https://api.nasa.gov/neo/rest/v1/neo/browse?api_key=${NASA_KEY}`);
+    const data = await res.json();
+    return data.near_earth_objects.filter(a => a.name.toLowerCase().includes(nombre.toLowerCase()));
+  }
+
+  function mostrarResultados(lista) {
+    const cont = document.getElementById("resultados");
+    cont.innerHTML = "";
+    if (!lista.length) return cont.innerHTML = "<p>No se encontraron resultados.</p>";
+    lista.forEach(a => {
+      const div = document.createElement("div");
+      div.className = "asteroid-item";
+      div.innerHTML = `${a.name} • ${a.estimated_diameter.meters.estimated_diameter_max.toFixed(0)} m`;
+      div.onclick = () => seleccionarAsteroide(a);
+      cont.appendChild(div);
+    });
+  }
+
+  function seleccionarAsteroide(a) {
+    asteroideSeleccionado = a;
+    const diam = a.estimated_diameter.meters.estimated_diameter_max.toFixed(0);
+    const vel = a.close_approach_data?.[0]?.relative_velocity?.kilometers_per_second || 20;
+
+    document.getElementById("nombreAst").innerText = a.name;
+    document.getElementById("diamVal").innerText = diam;
+    document.getElementById("velVal").innerText = vel;
+    document.getElementById("barDiam").style.width = Math.min(diam/200,100)+"%";
+    document.getElementById("barVel").style.width = Math.min(vel/50,100)+"%";
+    document.getElementById("barAng").style.width = "50%";
+    document.getElementById("simularBtn").disabled = false;
+  }
+
+  document.getElementById("buscarBtn").onclick = async () => {
+    const nombre = document.getElementById("busqueda").value.trim();
+    if (!nombre) return alert("Ingresa un nombre para buscar.");
+    const resultados = await buscarAsteroides(nombre);
+    mostrarResultados(resultados);
+  };
+
+  // Clic en el globo
+  const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  handler.setInputAction(e => {
+    const cartesian = viewer.scene.pickPosition(e.position);
+    if (!cartesian) return;
+    const c = Cesium.Cartographic.fromCartesian(cartesian);
+    const lon = Cesium.Math.toDegrees(c.longitude);
+    const lat = Cesium.Math.toDegrees(c.latitude);
+    selectedCoords = { lon, lat };
+    viewer.entities.removeAll();
+
+    // marcador brillante
+    viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(lon, lat),
+      point: {
+        pixelSize: 14,
+        color: Cesium.Color.RED,
+        outlineColor: Cesium.Color.WHITE,
+        outlineWidth: 3
+      },
+      label: { text: "Punto de impacto", fillColor: Cesium.Color.WHITE, pixelOffset: new Cesium.Cartesian2(0,-20) }
+    });
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+  // Cálculos físicos
+  function calcularImpacto(diam_m, vel_km_s, densidad=3000) {
+    const rad_m = diam_m / 2;
+    const vol = (4/3) * Math.PI * Math.pow(rad_m, 3);
+    const masa = vol * densidad;
+    const vel_m_s = vel_km_s * 1000;
+    const energia_J = 0.5 * masa * vel_m_s ** 2;
+    const energia_MT = energia_J / 4.184e15;
+    const crater_km = 1.161 * Math.pow(diam_m/1000, 0.78) * Math.pow(vel_km_s, 0.44);
+    return { energia_MT, crater_km };
+  }
+
+  // Simulación
+  document.getElementById("simularBtn").onclick = () => {
+    if (!selectedCoords || !asteroideSeleccionado) return alert("Selecciona asteroide y punto.");
+    const vel = parseFloat(asteroideSeleccionado.close_approach_data?.[0]?.relative_velocity?.kilometers_per_second || 20);
+    const diam = parseFloat(asteroideSeleccionado.estimated_diameter.meters.estimated_diameter_max || 500);
+    const { energia_MT, crater_km } = calcularImpacto(diam, vel);
+    animarImpacto(selectedCoords, crater_km, energia_MT);
+  };
+
+  // Animación de impacto
+  function animarImpacto(coords, crater_km, energia_MT) {
+    const boom = document.getElementById("boomSound");
+    boom.play();
+
+    const startHeight = 1800000;
+    const spacePos = Cesium.Cartesian3.fromDegrees(coords.lon, coords.lat, startHeight);
+    const impactPos = Cesium.Cartesian3.fromDegrees(coords.lon, coords.lat, 0);
+
+    const asteroid = viewer.entities.add({
+      position: spacePos,
+      point: { pixelSize: 10, color: Cesium.Color.YELLOW }
+    });
+
+    let t = 0;
+    const duration = 3000;
+    const start = performance.now();
+
+    function anim(now) {
+      t = Math.min((now - start) / duration, 1);
+      const h = startHeight * (1 - t);
+      asteroid.position = Cesium.Cartesian3.fromDegrees(coords.lon, coords.lat, h);
+      if (t < 1) requestAnimationFrame(anim);
+      else {
+        viewer.entities.remove(asteroid);
+        mostrarExplosion(impactPos, crater_km, energia_MT);
+      }
+    }
+    requestAnimationFrame(anim);
+  }
+
+  // Efecto visual de explosión
+  function mostrarExplosion(pos, crater_km, energia_MT) {
+    const ring = viewer.entities.add({
+      position: pos,
+      ellipse: {
+        semiMajorAxis: 1000,
+        semiMinorAxis: 1000,
+        material: Cesium.Color.ORANGE.withAlpha(0.8)
+      }
+    });
+
+    // expansión animada
+    let size = 1000;
+    const max = crater_km * 2000;
+    function expand() {
+      size += max / 60;
+      ring.ellipse.semiMajorAxis = size;
+      ring.ellipse.semiMinorAxis = size;
+      ring.ellipse.material = Cesium.Color.ORANGE.withAlpha(1 - size / max);
+      if (size < max) requestAnimationFrame(expand);
+      else {
+        viewer.entities.remove(ring);
+        mostrarCrater(pos, crater_km, energia_MT);
+      }
+    }
+    expand();
+  }
+
+  // Cráter final
+  function mostrarCrater(pos, crater_km, energia_MT) {
+    viewer.entities.add({
+      position: pos,
+      ellipse: {
+        semiMinorAxis: crater_km * 1000,
+        semiMajorAxis: crater_km * 1000,
+        material: Cesium.Color.RED.withAlpha(0.4)
+      },
+      label: {
+        text: `Energía: ${energia_MT.toFixed(1)} Mt\nCráter: ${crater_km.toFixed(2)} km`,
+        fillColor: Cesium.Color.WHITE,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM
+      }
+    });
+    viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(selectedCoords.lon, selectedCoords.lat, 800000), duration: 2 });
+  }
+</script>
+</body>
+</html>
+
+
