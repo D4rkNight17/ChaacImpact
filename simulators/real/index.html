@@ -41,10 +41,30 @@
       </div>
 
       <button id="simulateBtn">SIMULAR IMPACTO</button>
+      <button id="verInformeBtn" style="display:none;">VER INFORME</button>
+
+
+    </div>
+  </div>
+  <!-- 📜 Modal del informe -->
+  <div id="informeModal" style="display:none;">
+    <div class="informe-contenido">
+      <span id="cerrarInforme">&times;</span>
+      <h3 id="tituloInforme">🌍 Informe de Impacto</h3>
+
+      <div id="informeDatos" class="informe-grid">
+        <p>🪨 <b>Cráter:</b> <span id="infoCrater">–</span></p>
+        <p>📏 <b>Profundidad:</b> <span id="infoProf">–</span></p>
+        <p>🚀 <b>Velocidad:</b> <span id="infoVel">–</span></p>
+        <p>💥 <b>Energía:</b> <span id="infoEnergia">–</span></p>
+        <p><i id="infoDescripcion">–</i></p>
+      </div>
     </div>
   </div>
 
   <!-- Script principal -->
   <script src="js/main.js"></script>
+
 </body>
 </html>
+
