@@ -243,3 +243,34 @@ button:hover {
   }
 }
 
+.loader {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #00b4ff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 0.8s linear infinite;
+  margin-right: 6px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+/* ============================================= */
+/* 🔹 OPCIÓN 1: Ocultar completamente el banner Cesium */
+/* ============================================= */
+
+.cesium-viewer-bottom,
+.cesium-viewer-cesiumWidgetContainer .cesium-credit-logoContainer,
+.cesium-credit-textContainer {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
