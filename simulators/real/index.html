@@ -46,21 +46,54 @@
 
     </div>
   </div>
-  <!-- 📜 Modal del informe -->
-  <div id="informeModal" style="display:none;">
-    <div class="informe-contenido">
-      <span id="cerrarInforme">&times;</span>
-      <h3 id="tituloInforme">🌍 Informe de Impacto</h3>
+  <!-- ========================================================= -->
+<!-- 🌎 MODAL DE INFORME DE IMPACTO — CHAACIMPACT -->
+<!-- ========================================================= -->
+<div id="informeModal" style="display: none;">
+  <div class="informe-contenido">
+    <span id="cerrarInforme">✕</span>
+    <h3 id="tituloInforme">🌎 Informe de Impacto</h3>
 
-      <div id="informeDatos" class="informe-grid">
-        <p>🪨 <b>Cráter:</b> <span id="infoCrater">–</span></p>
-        <p>📏 <b>Profundidad:</b> <span id="infoProf">–</span></p>
-        <p>🚀 <b>Velocidad:</b> <span id="infoVel">–</span></p>
-        <p>💥 <b>Energía:</b> <span id="infoEnergia">–</span></p>
-        <p><i id="infoDescripcion">–</i></p>
+    <div id="informeDatos" class="informe-grid">
+
+      <div class="info-row">
+        <div class="label">
+          <span>🪨</span>
+          <span>Cráter:</span>
+        </div>
+        <div class="value" id="infoCrater">–</div>
       </div>
+
+      <div class="info-row">
+        <div class="label">
+          <span>📏</span>
+          <span>Profundidad:</span>
+        </div>
+        <div class="value" id="infoProf">–</div>
+      </div>
+
+      <div class="info-row">
+        <div class="label">
+          <span>🚀</span>
+          <span>Velocidad:</span>
+        </div>
+        <div class="value" id="infoVel">–</div>
+      </div>
+
+      <div class="info-row">
+        <div class="label">
+          <span>💥</span>
+          <span>Energía:</span>
+        </div>
+        <div class="value" id="infoEnergia">–</div>
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.15); margin: 10px 0;">
+      <p id="infoDescripcion">–</p>
     </div>
   </div>
+</div>
+
 
   <!-- Script principal -->
   <script src="js/main.js"></script>

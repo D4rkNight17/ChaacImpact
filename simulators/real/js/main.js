@@ -52,7 +52,16 @@ async function buscarAsteroides(nombre) {
   const resultados = [];
   const maxPaginas = 15;
   const cont = document.getElementById("results");
-  cont.innerHTML = `<p style="color:#00b4ff"><span class="loader"></span>Buscando asteroides...</p>`;
+  cont.style.display = "block"; // 🔹 Lo muestra solo al iniciar búsqueda
+  cont.innerHTML = `
+  <div class="search-loading">
+    <div class="loader"></div>
+    <span>Buscando asteroides<span class="dots">...</span></span>
+  </div>
+`;
+
+
+
 
   // Si está en caché, usarlo directamente
   const key = nombre.toLowerCase();
