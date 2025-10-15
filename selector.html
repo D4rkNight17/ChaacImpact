@@ -25,10 +25,12 @@
       </div>
       <!-- Links -->
       <ul class="hidden md:flex items-center gap-16">
-        <li><a href="index.html#inicio" class="mr-14 text-lg lg:text-xl font-semibold hover:text-violet-300">Inicio</a></li>
-        <li><a href="index.html#mitigacion" class="mr-9 text-lg lg:text-xl font-semibold hover:text-violet-300">Mitigación</a></li>
-        <li><a href="index.html#impacto" class="mr-9 text-lg lg:text-xl font-semibold hover:text-violet-300">Impacto</a></li>
-        <li><a href="index.html#asteroides" class="mr-9 text-lg lg:text-xl font-semibold hover:text-violet-300">Simulación</a></li>
+        <li><a href="#inicio" class="flex items-center gap-3"></a></li>
+        <li><a href="/index.html#inicio" class="menu-link block text-lg font-semibold hover:text-violet-300 py-3 px-6 md:p-0 transition-colors">Inicio</a></li>
+        <li><a href="/index.html#mitigacion" class="menu-link block text-lg font-semibold hover:text-violet-300 py-3 px-6 md:p-0 transition-colors">Mitigación</a></li>
+        <li><a href="/index.html#impacto" class="menu-link block text-lg font-semibold hover:text-violet-300 py-3 px-6 md:p-0 transition-colors">Impacto</a></li>
+        <li><a href="/index.html#asteroides" class="menu-link block text-lg font-semibold hover:text-violet-300 py-3 px-6 md:p-0 transition-colors">Simulación</a></li>
+        <li><a href="/index.html#videojuego" class="menu-link block text-lg font-semibold hover:text-violet-300 py-3 px-6 md:p-0 transition-colors">Videojuego</a></li>
       </ul>
     </nav>
   </header>
@@ -41,21 +43,21 @@
     >
       <div class="absolute inset-0 bg-gradient-to-b"></div>
       <div class="relative z-10 flex flex-col md:flex-row gap-20">
-        <!-- Real -->
+        <!-- Mitigación -->
         <div class="bg-purple-900/40 rounded-2xl p-6 w-64 hover:scale-105 transition">
           <h3 class="text-lg font-bold mb-4">Proteger</h3>
           <img src="/assets/mitigaciones.png" alt="Asteroide real" class="mx-auto w-64 mb-4 text"/>
           <button class="bg-purple-700 hover:bg-purple-600 px-4 py-2 rounded-md font-semibold text-sm text-center">
-            <a href="/Mitigaciones/index.html">Seleccionar</a>
+            <a href="/simulators/mitigation/mitigation.html">Seleccionar</a>
           </button>
         </div>
 
-        <!-- Crea el tuyo -->
+        <!-- Real -->
         <div class="bg-blue-900/40 rounded-2xl p-6 w-64 hover:scale-105 transition">
           <h3 class="text-lg font-bold mb-4">Destruir</h3>
           <img src="/assets/impacto.png" alt="Asteroide personalizado" class="mx-auto w-64 mb-4" />
           <button class="bg-blue-700 hover:bg-blue-600 px-4 py-2 rounded-md font-semibold text-sm">
-            <a href="/DATOSREALES/index.html">Seleccionar</a>
+            <a href="/simulators/real/real.html">Seleccionar</a>
           </button>
         </div>
       </div>
