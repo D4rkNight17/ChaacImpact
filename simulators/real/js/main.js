@@ -20,11 +20,18 @@ viewer = new Cesium.Viewer("cesiumContainer", {
   timeline: false,
   navigationHelpButton: false,
   fullscreenButton: false,
-  baseLayerPicker: true,
+  baseLayerPicker: false,
   geocoder: true,
   homeButton: true,
   sceneModePicker: true
 });
+
+// 🌎 Efecto atmosférico sutil
+viewer.scene.skyAtmosphere.brightnessShift = 0.5;
+viewer.scene.skyAtmosphere.hueShift = 0.05;
+viewer.scene.skyAtmosphere.saturationShift = 0.2;
+viewer.scene.globe.showGroundAtmosphere = true;
+
 
 viewer.scene.globe.depthTestAgainstTerrain = false;
 console.log("✅ ChaacImpact 3D inicializado sin backend.");

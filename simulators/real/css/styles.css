@@ -1,5 +1,5 @@
 /* ========================================================= */
-/* 🌎 CHAACIMPACT — Panel NASA-Level UI                      */
+/* 🌌 CHAACIMPACT — Theme: Night Steel                       */
 /* ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Rajdhani:wght@500;700&display=swap');
@@ -10,28 +10,32 @@ html, body, #cesiumContainer {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: radial-gradient(circle at 25% 20%, #04141b 0%, #00090d 100%);
+  background: radial-gradient(circle at 25% 20%, #0B141B 0%, #111E2D 100%);
   font-family: 'Inter', sans-serif;
-  color: #eaf8ff;
+  color: #CDD0CF;
 }
 
 /* ========================================================= */
-/* PANEL LATERAL                                             */
+/* PANEL LATERAL                                              */
 /* ========================================================= */
 #panel {
   position: absolute;
   top: 0;
   left: 0;
-  width: 280px;
+  width: 300px;
   height: 100%;
-  background: rgba(4, 20, 27, 0.96); /* Azul obsidiana */
+  background: #111E2D;
   backdrop-filter: blur(12px);
-  border-right: 1px solid rgba(0, 224, 209, 0.15);
+  border-right: 1px solid rgba(44, 60, 79, 0.7);
   box-shadow: 0 0 25px rgba(0, 0, 0, 0.45);
   overflow-y: auto;
   overflow-x: hidden;
-  transition: transform 0.4s ease;
+  transition: transform 0.7s ease;
   z-index: 9998;
+}
+
+#panel.hidden {
+  transform: translateX(-310px);
 }
 
 #panel::-webkit-scrollbar {
@@ -40,27 +44,27 @@ html, body, #cesiumContainer {
 }
 
 /* ========================================================= */
-/* HEADER — Corregido sin corte de píxeles                   */
+/* HEADER                                                     */
 /* ========================================================= */
 .panel-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(90deg, #007b7b 0%, #00e0d1 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(90deg, #0B141B 0%, #0B141B 100%);
+  border-bottom: 1px solid rgba(73, 90, 108, 0.6);
   padding: 14px 0;
   font-weight: 700;
   font-size: 17px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   font-family: 'Rajdhani', sans-serif;
-  color: #ffffff;
-  text-shadow: 0 0 8px rgba(0, 224, 209, 0.8);
+  color: #CDD0CF;
+  text-shadow: 0 0 8px rgba(141, 165, 175, 0.4);
   box-sizing: border-box;
 }
 
 /* ========================================================= */
-/* BOTÓN BURGER  */
+/* BOTÓN BURGER                                               */
 /* ========================================================= */
 #burgerBtn {
   position: absolute;
@@ -69,45 +73,36 @@ html, body, #cesiumContainer {
   width: 32px;
   height: 32px;
   z-index: 10000;
-
-  background-color: #303336;
-  border: 1px solid rgba(128, 128, 128, 0.4);
+  background-color: #101c24;
+  border: 1px solid rgba(73, 90, 108, 0.6);
   border-radius: 4px;
-  color: #fff;
-
+  color: #CDD0CF;
   font-size: 17px;
-  line-height: 32px;
+  line-height: 1px;
   font-family: "Arial", sans-serif;
   text-align: center;
   cursor: pointer;
   padding: 0;
   box-shadow: none;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition: background-color 0.25s, box-shadow 0.25s;
 }
 
 #burgerBtn:hover {
-  background-color: rgba(0, 224, 209, 0.3); /* Turquesa translúcido */
-  border-color: rgba(0, 224, 209, 0.7);
-  color: #00e0d1;
-  box-shadow: 0 0 8px rgba(0, 224, 209, 0.4);
+  background-color: #0B141B;
 }
 
 #burgerBtn:active {
-  background-color: rgba(38, 38, 38, 0.9);
-}
-
-#panel.hidden {
-  transform: translateX(-290px); /* se desliza hacia fuera */
+  background-color: rgba(17, 30, 45, 0.9);
 }
 
 /* ========================================================= */
-/* CONTENIDO DEL PANEL                                       */
+/* CONTENIDO DEL PANEL                                        */
 /* ========================================================= */
 .panel-content {
-  padding: 17px;
+  padding: 18px;
 }
 .panel-content h3 {
-  color: #00e0d1;
+  color: #CDD0CF;
   text-align: center;
   font-family: 'Rajdhani', sans-serif;
   font-size: 15.5px;
@@ -115,21 +110,21 @@ html, body, #cesiumContainer {
   letter-spacing: 0.5px;
 }
 .panel-content p {
-  color: #a6c5c5;
+  color: #8A9AA5;
   font-size: 13px;
   padding: 7px;
 }
 
 /* ========================================================= */
-/* INPUTS Y BOTONES                                          */
+/* INPUTS Y BOTONES                                           */
 /* ========================================================= */
 input {
   width: 91%;
-  padding: 10px 10px; /* 🔹 Aumenté el padding horizontal */
+  padding: 10px 10px;
   border-radius: 6px;
-  border: 1px solid rgba(0, 224, 209, 0.35);
-  background: rgba(10, 30, 35, 0.9);
-  color: #eaf8ff;
+  border: 1px solid rgba(73, 90, 108, 0.7);
+  background: rgba(27, 36, 48, 0.9);
+  color: #CDD0CF;
   font-size: 13px;
   outline: none;
   margin-bottom: 8px;
@@ -138,23 +133,23 @@ input {
 }
 
 input:focus {
-  border-color: #00e0d1;
-  box-shadow: 0 0 8px rgba(0, 224, 209, 0.4);
-  background: rgba(12, 38, 45, 0.95);
+  border-color: #8A9AA5;
+  box-shadow: 0 0 8px rgba(205, 208, 207, 0.25);
+  background: rgba(33, 44, 57, 0.95);
 }
 
 input::placeholder {
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(205, 208, 207, 0.4);
 }
 
 button {
-  margin-top: 2px;
+  margin-top: 4px;
   width: 100%;
   padding: 9px 0;
-  background: linear-gradient(90deg, #007b7b, #00e0d1);
+  background: linear-gradient(90deg, #2C3C4F, #495A6C);
   border: none;
   border-radius: 6px;
-  color: white;
+  color: #CDD0CF;
   font-weight: 600;
   cursor: pointer;
   font-size: 13.5px;
@@ -162,46 +157,47 @@ button {
   letter-spacing: 0.5px;
   transition: all 0.3s ease;
 }
+
 button:hover {
   transform: scale(1.02);
-  box-shadow: 0 0 10px rgba(0, 224, 209, 0.4);
+  box-shadow: 0 0 12px rgba(205, 208, 207, 0.25);
 }
 
-#verInformeBtn{
+#verInformeBtn {
   margin-top: 7px;
 }
 
 /* ========================================================= */
-/* 💡 Corrige el estilo del autocompletado del navegador     */
+/* 💡 Autocompletado coherente con tema Night Steel          */
 /* ========================================================= */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0px 1000px rgba(2, 14, 18, 0.9) inset !important;
-  -webkit-text-fill-color: #eaf8ff !important;
-  border: 1px solid rgba(0, 224, 209, 0.2) !important;
+  -webkit-box-shadow: 0 0 0px 1000px #1B2430 inset !important; /* Fondo oscuro */
+  -webkit-text-fill-color: #CDD0CF !important; /* Texto gris claro */
+  border: 1px solid rgba(73, 90, 108, 0.7) !important; /* Borde acorde */
   transition: background-color 5000s ease-in-out 0s !important;
 }
 
 
 /* ========================================================= */
-/* INFO SECTIONS                                             */
+/* INFO SECTIONS                                              */
 /* ========================================================= */
 .info-section {
   margin-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(73, 90, 108, 0.3);
   padding-top: 12px;
   font-size: 13px;
-  line-height: 1em;
-  color: #d1e8ff;
+  line-height: 1.4em;
+  color: #8A9AA5;
 }
 .info-section b {
-  color: #00e0d1;
+  color: #CDD0CF;
 }
 
 /* ========================================================= */
-/* 🌎 MODAL DE INFORME ESTÉTICO Y EQUILIBRADO                */
+/* MODAL DE INFORME                                           */
 /* ========================================================= */
 #informeModal {
   position: fixed;
@@ -209,7 +205,7 @@ input:-webkit-autofill:active {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(11, 20, 27, 0.85);
   display: none;
   justify-content: center;
   align-items: center;
@@ -218,18 +214,15 @@ input:-webkit-autofill:active {
 }
 
 .informe-contenido {
-  background: rgba(8, 20, 25, 0.96);
-  color: #d3ffff;
+  background: rgba(17, 30, 45, 0.97);
+  color: #CDD0CF;
   border-radius: 14px;
   padding: 22px 24px;
-  width: 310px; /* 🔹 más compacto */
-  box-shadow: 0 0 18px rgba(0, 224, 209, 0.18);
-  font-size: 14px;
-  line-height: 1.5;
-  position: relative;
-  animation: popIn 0.3s ease forwards;
-  border: 1px solid rgba(0, 224, 209, 0.15);
+  width: 310px;
+  box-shadow: 0 0 20px rgba(73, 90, 108, 0.2);
+  border: 1px solid rgba(73, 90, 108, 0.4);
   backdrop-filter: blur(10px);
+  transition: 0.4s;
 }
 
 #tituloInforme {
@@ -237,25 +230,23 @@ input:-webkit-autofill:active {
   margin-bottom: 12px;
   font-size: 16.5px;
   font-weight: 700;
-  color: #00e0d1;
+  color: #CDD0CF;
   font-family: 'Rajdhani', sans-serif;
 }
 
-/* Cerrar botón */
 #cerrarInforme {
   position: absolute;
   top: 6px;
   right: 12px;
   font-size: 20px;
   cursor: pointer;
-  color: #bfe1ff;
+  color: #8A9AA5;
   transition: 0.2s;
 }
 #cerrarInforme:hover {
-  color: #ff7070;
+  color: #CDD0CF;
 }
 
-/* === Fila de información (icono + etiqueta + valor) === */
 .info-row {
   display: flex;
   justify-content: space-between;
@@ -265,43 +256,70 @@ input:-webkit-autofill:active {
   font-size: 13.5px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
-
 .info-row .label {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #b5e4e4;
+  color: #8A9AA5;
   font-weight: 500;
 }
-
 .info-row .value {
-  color: #ffffff;
+  color: #CDD0CF;
   font-weight: 600;
   text-align: right;
 }
 
-/* Descripción final */
 #infoDescripcion {
   margin-top: 10px;
   font-style: italic;
-  color: #aee7e7;
+  color: #8A9AA5;
   text-align: justify;
   font-size: 13px;
   line-height: 1.4;
 }
 
-/* Colores de nivel */
-.nivel-verde { color: #00ff9d; }
-.nivel-naranja { color: #d87436; }
-.nivel-rojo { color: #ff4d4d; }
-
+/* ========================================================= */
+/* COLORES DE NIVEL                                           */
+/* ========================================================= */
+.nivel-verde { color: #00C78E; }
+.nivel-naranja { color: #D87436; }
+.nivel-rojo { color: #FF5F5F; }
 
 /* ========================================================= */
-/* COLORES DE NIVEL                                          */
+/* RESULTADOS DE ASTEROIDES                                   */
 /* ========================================================= */
-.nivel-verde { color: #00ff9d; }
-.nivel-naranja { color: #d87436; }
-.nivel-rojo { color: #ff4d4d; }
+#results {
+  margin-top: 10px;
+  font-size: 13.5px;
+  color: #CDD0CF;
+  background: rgba(17, 30, 45, 0.8);
+  border-radius: 8px;
+  border: 1px solid rgba(73, 90, 108, 0.5);
+  padding: 8px 10px;
+  max-height: 130px;
+  overflow-y: auto;
+  box-shadow: inset 0 0 6px rgba(73, 90, 108, 0.25);
+  display: none;
+}
+
+.asteroid-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.asteroid-item:hover {
+  background: rgba(73, 90, 108, 0.25);
+  transform: translateX(4px);
+}
+.asteroid-icon {
+  font-size: 16px;
+  color: #8A9AA5;
+  flex-shrink: 0;
+}
 
 /* ========================================================= */
 /* OCULTAR CREDITOS CESIUM                                   */
@@ -319,63 +337,7 @@ input:-webkit-autofill:active {
 }
 
 /* ========================================================= */
-/* LISTA DE RESULTADOS DE ASTEROIDES                         */
-/* ========================================================= */
-#results {
-  margin-top: 10px;
-  font-size: 13.5px;
-  color: #d1f7ff;
-  background: rgba(0, 20, 25, 0.65);
-  border-radius: 8px;
-  border: 1px solid rgba(0, 224, 209, 0.25);
-  padding: 8px 10px;
-  max-height: 130px;
-  overflow-y: auto;
-  transition: all 0.3s ease;
-  box-shadow: inset 0 0 6px rgba(0, 224, 209, 0.1);
-}
-
-#results::-webkit-scrollbar {
-  width: 6px;
-}
-#results::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 224, 209, 0.4);
-  border-radius: 6px;
-}
-
-/* Cada asteroide individual */
-.asteroid-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 4px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.asteroid-item:last-child {
-  border-bottom: none;
-}
-
-.asteroid-item:hover {
-  background: rgba(0, 224, 209, 0.1);
-  transform: translateX(4px);
-}
-
-/* Emoji o ícono */
-.asteroid-icon {
-  font-size: 16px;
-  color: #00e0d1;
-  flex-shrink: 0;
-}
-
-#results {
-  display: none; /* 🔹 Oculto hasta que se haga una búsqueda */
-}
-
-/* ========================================================= */
-/* 🔵 Animación de carga “Buscando asteroides…”              */
+/* 🔵 ANIMACIÓN “BUSCANDO ASTEROIDES…”                       */
 /* ========================================================= */
 .search-loading {
   display: flex;
@@ -383,35 +345,53 @@ input:-webkit-autofill:active {
   align-items: center;
   justify-content: center;
   padding: 20px 0;
-  color: #8fd7d7;
+  color: #8A9AA5;
   font-family: 'Rajdhani', sans-serif;
   font-size: 14px;
   letter-spacing: 0.5px;
 }
-
 .search-loading .loader {
-  width: 26px;
-  height: 26px;
-  border: 2px solid rgba(0, 224, 209, 0.25);
-  border-top: 2px solid #00e0d1;
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(73, 90, 108, 0.4);
+  border-top: 2px solid #CDD0CF;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 6px; /* 🔹 Más pegado al texto */
+  margin-bottom: 6px;
 }
-
 .search-loading .dots {
   display: inline-block;
   animation: dots 1.4s steps(4, end) infinite;
   margin-left: 2px;
 }
-
 @keyframes dots {
   0%, 20% { color: transparent; text-shadow: .25em 0 transparent, .5em 0 transparent; }
-  40% { color: #00e0d1; text-shadow: .25em 0 transparent, .5em 0 transparent; }
-  60% { color: #00e0d1; text-shadow: .25em 0 #00e0d1, .5em 0 transparent; }
-  80%, 100% { color: #00e0d1; text-shadow: .25em 0 #00e0d1, .5em 0 #00e0d1; }
+  40% { color: #CDD0CF; text-shadow: .25em 0 transparent, .5em 0 transparent; }
+  60% { color: #CDD0CF; text-shadow: .25em 0 #CDD0CF, .5em 0 transparent; }
+  80%, 100% { color: #CDD0CF; text-shadow: .25em 0 #CDD0CF, .5em 0 #CDD0CF; }
 }
-
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* 🌌 Botones con efecto táctil realista */
+button {
+  background: linear-gradient(90deg, #2C3C4F, #495A6C);
+  border: none;
+  color: #CDD0CF;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.25s ease;
+}
+
+button:hover {
+  background: linear-gradient(90deg, #495A6C, #8A9AA5);
+  transform: scale(1.03);
+  box-shadow: 0 0 10px rgba(205, 208, 207, 0.25);
+  color: #FFFFFF;
+}
+
+button:active {
+  transform: scale(.95);
+  box-shadow: 0 0 4px rgba(205, 208, 207, 0.15);
 }
