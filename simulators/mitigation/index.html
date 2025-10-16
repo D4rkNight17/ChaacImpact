@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☄️ Calculadora de Mitigación de Asteroides NEO</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- HEADER -->
+    <header class="app-header">
+      <h1>☄️ Calculadora de Mitigación de Asteroides NEO</h1>
+      <p class="subtitle">Sistema de visualización 3D y análisis de estrategias de deflexión</p>
+      <button onclick="restartTutorial()" class="btn btn-secondary" style="margin-top: 30px;">Tutorial</button>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="app-content">
+      <!-- LEFT SIDEBAR -->
+      <aside class="sidebar sidebar-left">
+        <!-- Búsqueda de Asteroides -->
+        <section class="card">
+          <h2 class="card-title">🔍 Buscar Asteroide</h2>
+          <div class="form-group">
+            <label for="searchQuery">Nombre, fragmento o ID</label>
+            <input id="searchQuery" type="text" placeholder="ej: Apophis, Bennu, 433" />
+          </div>
+          <div class="button-group">
+            <button id="searchBtn" class="btn btn-primary">🔎 Buscar</button>
+            <button id="clearBtn" class="btn btn-danger">🗑️ Limpiar</button>
+          </div>
+          <div class="form-group">
+            <label for="neoSelect">📋 Resultados (doble clic)</label>
+            <select id="neoSelect" size="6" class="neo-select"></select>
+          </div>
+          <button id="loadDetailBtn" class="btn btn-secondary btn-block">📥 Cargar</button>
+        </section>
+
+        <!-- Información del Asteroide -->
+        <section class="card">
+          <h2 class="card-title">📊 Asteroide</h2>
+          <div id="asteroidDetails" class="asteroid-info">
+            <em class="text-muted">Ninguno</em>
+          </div>
+        </section>
+
+        <!-- Distancias -->
+        <section class="card">
+          <h2 class="card-title">📏 Distancias</h2>
+          <div class="info-box">
+            <div id="minDistanceInfo" class="info-item"><strong>Mínima:</strong> N/A</div>
+            <div id="currentDistance" class="info-item"><strong>Actual:</strong> Esperando...</div>
+          </div>
+        </section>
+      </aside>
+
+      <!-- CENTER: Visualización 3D -->
+      <main class="main-view">
+        <div class="viz-container">
+          <canvas id="canvas3d"></canvas>
+          <div id="gameTimer" class="game-timer"></div>
+          <div class="viz-overlay" id="vizInfo">Selecciona un asteroide y calcula estrategias</div>
+        </div>
+
+        <!-- Controles -->
+        <section class="controls-bar">
+          <div class="control-group">
+            <button id="playPauseBtn" class="btn btn-control">⏸️ Pause</button>
+            <button id="resetSimBtn" class="btn btn-control">🔄 Reset</button>
+          </div>
+        </section>
+
+        <!-- Leyenda -->
+        <section class="legend-box">
+          <div class="legend-title">📖 Leyenda</div>
+          <div class="legend-items">
+            <div class="legend-item"><div class="legend-swatch orbit-original"></div><span>Órbita original</span></div>
+            <div class="legend-item"><div class="legend-swatch orbit-modified"></div><span>Órbita desviada</span></div>
+            <div class="legend-item"><div class="legend-swatch marker-asteroid"></div><span>Asteroide</span></div>
+            <div class="legend-item"><div class="legend-swatch marker-earth"></div><span>Tierra</span></div>
+            <div class="legend-item"><div class="legend-swatch marker-encounter"></div><span>Encuentro</span></div>
+          </div>
+        </section>
+
+        <!-- Gráfico -->
+        <section class="graph-container">
+          <canvas id="encounterGraph" width="800" height="250"></canvas>
+        </section>
+      </main>
+
+      <!-- RIGHT SIDEBAR -->
+      <aside class="sidebar sidebar-right">
+        <!-- Modo Juego - MOVIDO ARRIBA -->
+        <section class="card card-game-enhanced">
+          <div class="game-header">
+            <h2 class="card-title">🚨 DEFENSA PLANETARIA</h2>
+            <button onclick="showInfoPanel('game')" class="btn-info">ℹ️</button>
+          </div>
+          <div class="game-description">
+            ¡Modo desafío! Simulación de asteroide en curso de colisión
+          </div>
+          <div class="form-group">
+            <label for="gameDaysInput">
+              Días hasta impacto:
+              <button onclick="showInfoPanel('days')" class="btn-info-inline">ℹ️</button>
+            </label>
+            <input id="gameDaysInput" type="number" value="180" min="30" max="365" step="30" />
+          </div>
+          <button id="startGameBtn" class="btn btn-danger btn-block btn-pulse">
+            <span class="btn-icon">🚨</span> INICIAR AMENAZA
+          </button>
+        </section>
+
+        <!-- Parámetros - MEJORADO -->
+        <section class="card">
+          <div class="section-header">
+            <h2 class="card-title">🎯 Misión</h2>
+            <button onclick="showInfoPanel('mission')" class="btn-info">ℹ️</button>
+          </div>
+          <div class="form-group">
+            <label for="warningTime">
+              ⏱️ Tiempo de Advertencia (años)
+              <button onclick="showInfoPanel('warning')" class="btn-info-inline">ℹ️</button>
+            </label>
+            <input id="warningTime" type="number" value="10" min="0.1" step="0.1" />
+          </div>
+          <button id="calcBtn" class="btn btn-primary btn-block btn-large">
+            <span class="btn-icon">🚀</span> CALCULAR ESTRATEGIAS
+            <button onclick="showInfoPanel('calculate'); event.stopPropagation();" class="btn-info-inline" style="margin-left: 8px;">ℹ️</button>
+          </button>
+          <div class="info-box">
+            <div class="info-title">📈 Resumen</div>
+            <div id="resultsSummary" class="info-content">Sin resultados</div>
+          </div>
+        </section>
+
+        <!-- Configuración - MEJORADO -->
+        <section class="card">
+          <div class="section-header">
+            <h2 class="card-title">🎨 Renderizado</h2>
+            <button onclick="showInfoPanel('rendering')" class="btn-info">ℹ️</button>
+          </div>
+          <div class="form-group">
+            <label for="segmentsSlider">
+              Segmentos: <span id="segmentsLabel" class="value-label">256</span>
+              <button onclick="showInfoPanel('segments')" class="btn-info-inline">ℹ️</button>
+            </label>
+            <input type="range" id="segmentsSlider" min="64" max="512" value="256" step="64" class="slider">
+          </div>
+          <div class="form-group">
+            <label for="samplesSlider">
+              Muestras: <span id="samplesLabel" class="value-label">1500</span>
+              <button onclick="showInfoPanel('samples')" class="btn-info-inline">ℹ️</button>
+            </label>
+            <input type="range" id="samplesSlider" min="500" max="3000" value="1500" step="500" class="slider">
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <!-- RESULTS -->
+    <section class="results-section">
+      <h2 class="section-title">🛡️ Estrategias de Mitigación</h2>
+      <div id="resultsGrid" class="results-grid"></div>
+    </section>
+  </div>
+
+  <!-- TUTORIAL -->
+  <div id="tutorialSpotlight" class="tutorial-spotlight"></div>
+  
+  <div id="tutorialCharacter" class="tutorial-character" style="display: none;">
+    <img src="images/chaactutorial.png" alt="ChaacImpact">
+  </div>
+
+  <div id="tutorialDialog" class="tutorial-dialog" style="display: none;">
+    <div class="tutorial-title">
+      <span id="tutorialIcon">⚡</span>
+      <span id="tutorialTitleText">¡Bienvenido!</span>
+    </div>
+    <div class="tutorial-content" id="tutorialContentText">Cargando tutorial...</div>
+    <div class="tutorial-controls">
+      <span class="tutorial-progress" id="tutorialProgress">1 / 8</span>
+      <button class="tutorial-btn tutorial-btn-skip" id="tutorialSkip">Saltar</button>
+      <button class="tutorial-btn tutorial-btn-secondary" id="tutorialPrev" style="display: none;">← Anterior</button>
+      <button class="tutorial-btn" id="tutorialNext">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PANEL DE INFORMACIÓN -->
+  <div id="infoPanel" class="info-panel" style="display: none;">
+    <div class="info-panel-content">
+      <button onclick="closeInfoPanel()" class="info-panel-close">✕</button>
+      <h3 id="infoPanelTitle"></h3>
+      <p id="infoPanelText"></p>
+    </div>
+  </div>
+  <div id="infoPanelOverlay" class="info-panel-overlay" style="display: none;" onclick="closeInfoPanel()"></div>
+
+  <!-- THREE.JS -->
+  <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
