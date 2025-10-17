@@ -10,14 +10,20 @@ function setLanguage(lang) {
     setTimeout(() => {
       el.textContent = el.getAttribute(`data-${lang}`);
       el.classList.remove("fade-out");
-    }, 200);
+    }, 300);
   });
 
-  localStorage.setItem("lang", lang);
-  flagIcon.src = lang === "en"
-    ? "https://flagcdn.com/us.svg"
-    : "https://flagcdn.com/mx.svg";
-  flagIcon.alt = lang === "en" ? "English" : "Español";
+    localStorage.setItem("lang", lang);
+
+  // 🔥 Efecto de transición suave para la bandera
+  flagIcon.style.opacity = 0;
+  setTimeout(() => {
+    flagIcon.src = lang === "en"
+      ? "https://flagcdn.com/us.svg"
+      : "https://flagcdn.com/mx.svg";
+    flagIcon.alt = lang === "en" ? "English" : "Español";
+    flagIcon.style.opacity = 1;
+  }, 200);
 }
 
 langBtn.addEventListener("click", () => {
