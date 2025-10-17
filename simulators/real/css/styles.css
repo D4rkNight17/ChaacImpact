@@ -75,34 +75,34 @@ body {
 /* ========================================================= */
 /* BOTÓN BURGER                                               */
 /* ========================================================= */
-#burgerBtn {
+/* === Burger exclusivo === */
+.burger-toggle {
   position: absolute;
   top: 5px;
   left: 5px;
-  width: 32px;
-  height: 32px;
-  z-index: 10000;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: #101c24;
   border: 1px solid rgba(73, 90, 108, 0.6);
   border-radius: 4px;
   color: #CDD0CF;
-  font-size: 17px;
-  line-height: 1px;
-  font-family: "Arial", sans-serif;
-  text-align: center;
   cursor: pointer;
-  padding: 0;
-  box-shadow: none;
+  z-index: 10000;
   transition: background-color 0.25s, box-shadow 0.25s;
 }
 
-#burgerBtn:hover {
+.burger-toggle:hover {
   background-color: #0B141B;
 }
 
-#burgerBtn:active {
+.burger-toggle:active {
   background-color: rgba(17, 30, 45, 0.9);
 }
+
 
 /* ========================================================= */
 /* CONTENIDO DEL PANEL                                        */
@@ -403,4 +403,14 @@ button:hover {
 button:active {
   transform: scale(.95);
   box-shadow: 0 0 4px rgba(205, 208, 207, 0.15);
+}
+
+/*Regresar al home*/
+.titulo {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.titulo:hover {
+  opacity: 0.8;
 }

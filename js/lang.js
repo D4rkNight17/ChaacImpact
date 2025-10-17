@@ -13,22 +13,27 @@ function setLanguage(lang) {
     }, 300);
   });
 
-    localStorage.setItem("lang", lang);
+  localStorage.setItem("lang", lang);
 
-  // 🔥 Efecto de transición suave para la bandera
-  flagIcon.style.opacity = 0;
-  setTimeout(() => {
-    flagIcon.src = lang === "en"
-      ? "https://flagcdn.com/us.svg"
-      : "https://flagcdn.com/mx.svg";
-    flagIcon.alt = lang === "en" ? "English" : "Español";
-    flagIcon.style.opacity = 1;
-  }, 200);
+  if (flagIcon) {
+    flagIcon.style.opacity = 0;
+    setTimeout(() => {
+      flagIcon.src = lang === "en"
+        ? "https://flagcdn.com/us.svg"
+        : "https://flagcdn.com/mx.svg";
+      flagIcon.alt = lang === "en" ? "English" : "Español";
+      flagIcon.style.opacity = 1;
+    }, 200);
+  }
 }
 
-langBtn.addEventListener("click", () => {
-  currentLang = currentLang === "en" ? "es" : "en";
-  setLanguage(currentLang);
-});
-
+// ✅ aplicar idioma guardado al cargar cualquier página
 window.addEventListener("DOMContentLoaded", () => setLanguage(currentLang));
+
+// ✅ cambiar idioma con clic
+if (langBtn) {
+  langBtn.addEventListener("click", () => {
+    currentLang = currentLang === "en" ? "es" : "en";
+    setLanguage(currentLang);
+  });
+}

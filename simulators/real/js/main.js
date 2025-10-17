@@ -2,6 +2,33 @@
 // 🌎 ChaacImpact — Simulador 3D Realista SIN BACKEND (versión final)
 // ==========================================================
 
+
+// === Traducciones dinámicas ===
+const LANG_TEXTS = {
+  es: {
+    searchLoading: "Buscando asteroides",
+    searchError: "⚠️ Error al conectar con la NASA API.",
+    noResults: "No se encontraron resultados.",
+    selectBoth: "Selecciona un asteroide y un punto del mapa.",
+    impactPoint: "Punto de impacto",
+    localImpact: "Impacto local (daños regionales)",
+    continentalImpact: "Impacto continental",
+    globalImpact: "Impacto global catastrófico",
+  },
+  en: {
+    searchLoading: "Searching asteroids",
+    searchError: "⚠️ Error connecting to NASA API.",
+    noResults: "No results found.",
+    selectBoth: "Select an asteroid and a point on the map.",
+    impactPoint: "Impact point",
+    localImpact: "Local impact (regional damage)",
+    continentalImpact: "Continental impact",
+    globalImpact: "Global catastrophic impact",
+  }
+};
+
+let currentLang = localStorage.getItem("lang") || "es";
+
 // === Variables globales ===
 let viewer;
 let selectedCoords = null;
@@ -59,26 +86,21 @@ async function buscarAsteroides(nombre) {
   const resultados = [];
   const maxPaginas = 15;
   const cont = document.getElementById("results");
-  cont.style.display = "block"; // 🔹 Lo muestra solo al iniciar búsqueda
+
+  cont.style.display = "block";
   cont.innerHTML = `
   <div class="search-loading">
     <div class="loader"></div>
-    <span>Buscando asteroides<span class="dots">...</span></span>
+    <span>${LANG_TEXTS[currentLang].searchLoading}<span class="dots">...</span></span>
   </div>
 `;
 
-
-
-
-  // Si está en caché, usarlo directamente
   const key = nombre.toLowerCase();
   if (cacheAsteroides[key]) {
-    console.log("♻️ Resultado obtenido desde caché:", key);
     mostrarResultados(cacheAsteroides[key]);
     return;
   }
 
-  // Barra de carga
   const barra = document.createElement("div");
   barra.style.height = "4px";
   barra.style.width = "0%";
@@ -106,7 +128,7 @@ async function buscarAsteroides(nombre) {
       url = data.links.next;
     } catch (error) {
       console.error("❌ Error al buscar asteroides:", error);
-      cont.innerHTML = "<p style='color:#ff7070'>⚠️ Error al conectar con la NASA API.</p>";
+      cont.innerHTML = `<p style='color:#ff7070'>${LANG_TEXTS[currentLang].searchError}</p>`;
       return;
     }
   }
@@ -115,7 +137,7 @@ async function buscarAsteroides(nombre) {
   setTimeout(() => barra.remove(), 800);
 
   if (!resultados.length) {
-    cont.innerHTML = "<p>No se encontraron resultados.</p>";
+    cont.innerHTML = `<p>${LANG_TEXTS[currentLang].noResults}</p>`;
   } else {
     cacheAsteroides[key] = resultados;
     mostrarResultados(resultados);
@@ -126,7 +148,7 @@ function mostrarResultados(lista) {
   const cont = document.getElementById("results");
   cont.innerHTML = "";
   if (!lista.length) {
-    cont.innerHTML = "<p>No se encontraron resultados.</p>";
+    cont.innerHTML = `<p>${LANG_TEXTS[currentLang].noResults}</p>`;
     return;
   }
 
@@ -152,12 +174,12 @@ function seleccionarAsteroide(a) {
 
 document.getElementById("searchBtn").onclick = async () => {
   const nombre = document.getElementById("searchAst").value.trim();
-  if (!nombre) return alert("Ingresa el nombre de un asteroide.");
+  if (!nombre) return alert(LANG_TEXTS[currentLang].selectBoth);
   await buscarAsteroides(nombre);
 };
 
 // ==========================================================
-// === CAPTURA DE COORDENADAS EN EL GLOBO ===
+// === CAPTURA DE COORDENADAS ===
 // ==========================================================
 const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
 handler.setInputAction((e) => {
@@ -172,14 +194,40 @@ handler.setInputAction((e) => {
   viewer.entities.add({
     position: Cesium.Cartesian3.fromDegrees(lon, lat),
     point: { pixelSize: 14, color: Cesium.Color.RED, outlineColor: Cesium.Color.WHITE, outlineWidth: 3 },
-    label: { text: "Punto de impacto", fillColor: Cesium.Color.WHITE, pixelOffset: new Cesium.Cartesian2(0, -20) }
+    label: { text: LANG_TEXTS[currentLang].impactPoint, fillColor: Cesium.Color.WHITE, pixelOffset: new Cesium.Cartesian2(0, -20) }
   });
 
   document.getElementById("coords").innerText = `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
 // ==========================================================
-// === FUNCIONES FÍSICAS PRINCIPALES (versión avanzada NASA) ===
+// === SIMULAR IMPACTO ===
+// ==========================================================
+document.getElementById("simulateBtn").onclick = async () => {
+  if (!selectedCoords || !selectedAsteroid)
+    return alert(LANG_TEXTS[currentLang].selectBoth);
+
+  const diam = parseFloat(selectedAsteroid.estimated_diameter.meters.estimated_diameter_max || 100);
+  const vel = parseFloat(selectedAsteroid.close_approach_data?.[0]?.relative_velocity?.kilometers_per_second || 20);
+  const densidad = 3000;
+  const angulo = 45;
+
+  const carto = Cesium.Cartographic.fromDegrees(selectedCoords.lon, selectedCoords.lat);
+  const [sample] = await Cesium.sampleTerrainMostDetailed(viewer.terrainProvider, [carto]);
+  const altura = sample?.height ?? 0;
+
+  const { rho_t, tipo } = densidadTerrenoPorAltura(altura, selectedCoords.lat, selectedCoords.lon);
+  const masa = masaImpactor(diam, densidad);
+  const { E, E_Mt } = energiaImpacto(masa, vel);
+  const { D_f, R_e } = craterYEyecta(diam, vel, densidad, rho_t, angulo);
+  const efectos = calcularEfectosSecundarios(E, D_f, vel, tipo, R_e);
+
+  generarInformeDesastres(E_Mt, D_f, R_e, tipo);
+  animarImpacto(selectedCoords, D_f, E_Mt, R_e);
+};
+
+// ==========================================================
+// === FUNCIONES FÍSICAS (sin cambios)
 // ==========================================================
 const g = 9.81, mu = 0.22, nu = 0.33, Cg = 1.6, k_c = 1.3, k_e = 3.0;
 
@@ -386,20 +434,31 @@ function mostrarCrater(impactPos, crater_km) {
 // === INFORME FINAL ===
 // ==========================================================
 function generarInformeDesastres(E_Mt, D_f, R_e, tipo) {
-  let nivel;
-  if (E_Mt < 1e3) nivel = "Impacto local (daños regionales)";
-  else if (E_Mt < 1e6) nivel = "Impacto continental";
-  else nivel = "Impacto global catastrófico";
+  const txt = LANG_TEXTS[currentLang];
 
-  const descripcion =
-    E_Mt < 1e3
+  let nivel, titulo, descripcion;
+  if (E_Mt < 1e3) {
+    nivel = txt.localImpact;
+    titulo = currentLang === "es" ? "🟢 Impacto Local — Nivel Verde" : "🟢 Local Impact — Green Level";
+    descripcion = currentLang === "es"
       ? "Daños severos en un radio de decenas de kilómetros. Colapso estructural y vientos supersónicos localizados."
-      : E_Mt < 1e6
+      : "Severe damage within tens of kilometers. Structural collapse and localized supersonic winds.";
+  } else if (E_Mt < 1e6) {
+    nivel = txt.continentalImpact;
+    titulo = currentLang === "es" ? "🟠 Impacto Continental — Nivel Naranja" : "🟠 Continental Impact — Orange Level";
+    descripcion = currentLang === "es"
       ? "Destrucción continental. Incendios globales y alteración climática a gran escala."
-      : "Extinción masiva global. Oscurecimiento atmosférico y fusión superficial terrestre.";
+      : "Continental destruction. Global fires and large-scale climate disruption.";
+  } else {
+    nivel = txt.globalImpact;
+    titulo = currentLang === "es" ? "🔴 Impacto Global — Nivel Rojo" : "🔴 Global Impact — Red Level";
+    descripcion = currentLang === "es"
+      ? "Extinción masiva global. Oscurecimiento atmosférico y fusión superficial terrestre."
+      : "Global mass extinction. Atmospheric darkening and surface melting of the Earth.";
+  }
 
-  const velocidad_impacto = (Math.random() * 12 + 5).toFixed(1); // km/s promedio
-  const profundidad_crater = (D_f * 0.06 / 1000).toFixed(2); // km aprox
+  const velocidad_impacto = (Math.random() * 12 + 5).toFixed(1);
+  const profundidad_crater = (D_f * 0.06 / 1000).toFixed(2);
 
   ultimoInforme = {
     energia_MT: E_Mt.toFixed(0),
@@ -412,18 +471,6 @@ function generarInformeDesastres(E_Mt, D_f, R_e, tipo) {
     descripcion
   };
 
-  console.table({
-    "Energía (Mt)": E_Mt.toFixed(2),
-    "Cráter (m)": D_f.toFixed(2),
-    "Radio eyecta (m)": R_e.toFixed(2),
-    "Profundidad (m)": (D_f * 0.06).toFixed(2),
-    "Velocidad (km/s)": velocidad_impacto,
-    "Terreno": tipo,
-    "Nivel": nivel,
-    "Descripción": descripcion
-  });
-
-  // === Mostrar en el modal ===
   document.getElementById("verInformeBtn").style.display = "block";
   document.getElementById("infoCrater").innerText = `${ultimoInforme.crater_km} km`;
   document.getElementById("infoProf").innerText = `${ultimoInforme.profundidad_km} km`;
@@ -431,19 +478,21 @@ function generarInformeDesastres(E_Mt, D_f, R_e, tipo) {
   document.getElementById("infoEnergia").innerText = `${(ultimoInforme.energia_MT / 1000).toFixed(1)} Gigatones TNT`;
   document.getElementById("infoDescripcion").innerText = ultimoInforme.descripcion;
 
-  const titulo = document.getElementById("tituloInforme");
-  titulo.className = "";
-  if (nivel.includes("local")) {
-    titulo.classList.add("nivel-verde");
-    titulo.innerText = "🟢 Impacto Local — Nivel Verde";
-  } else if (nivel.includes("continental")) {
-    titulo.classList.add("nivel-naranja");
-    titulo.innerText = "🟠 Impacto Continental — Nivel Naranja";
-  } else {
-    titulo.classList.add("nivel-rojo");
-    titulo.innerText = "🔴 Impacto Global — Nivel Rojo";
-  }
+  const tituloElem = document.getElementById("tituloInforme");
+  tituloElem.className = "";
+  if (nivel.includes("local") || nivel.includes("Local")) tituloElem.classList.add("nivel-verde");
+  else if (nivel.includes("continental") || nivel.includes("Continental")) tituloElem.classList.add("nivel-naranja");
+  else tituloElem.classList.add("nivel-rojo");
+
+  tituloElem.innerText = titulo;
+
+  // 🧩 Etiquetas del modal traducidas
+  document.querySelector('.label span:nth-child(2)').innerText = currentLang === "es" ? "Cráter:" : "Crater:";
+  document.querySelectorAll('.label span:nth-child(2)')[1].innerText = currentLang === "es" ? "Profundidad:" : "Depth:";
+  document.querySelectorAll('.label span:nth-child(2)')[2].innerText = currentLang === "es" ? "Velocidad:" : "Velocity:";
+  document.querySelectorAll('.label span:nth-child(2)')[3].innerText = currentLang === "es" ? "Energía:" : "Energy:";
 }
+
 
 
 const modal = document.getElementById("informeModal");
