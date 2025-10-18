@@ -1,4 +1,4 @@
-/* ================== SIMULADOR NEO EARTH-CENTERED ================== */
+/* ================== SIMULADOR NEO EARTH-CENTERED - OPTIMIZADO ================== */
 
 /* -------------------- CONSTANTES -------------------- */
 const AU = 1.495978707e11;
@@ -642,19 +642,45 @@ function initThreeUnified() {
   // Guardar referencia para actualizar posición después
   window.sunLight = sunLight;
   
-  // Tierra con textura mejorada
-  const earthGeometry = new THREE.SphereGeometry(kmToRenderUnits(EARTH_RADIUS_KM), 32, 32);
+  // Tierra con textura
+  const earthGeometry = new THREE.SphereGeometry(kmToRenderUnits(EARTH_RADIUS_KM), 64, 64);
   const earthTexture = createEarthTexture();
+
   const earthMaterial = new THREE.MeshStandardMaterial({ 
     map: earthTexture,
     emissive: 0x112244,
     emissiveIntensity: 0.1,
-    roughness: 0.8,
-    metalness: 0.2
+    roughness: 0.9,
+    metalness: 0.1
   });
+
   earth = new THREE.Mesh(earthGeometry, earthMaterial);
   earth.position.set(0, 0, 0);
-  scene.add(earth);
+  const earthTilt = new THREE.Object3D();
+  earthTilt.rotation.x = toRad(23.5); // inclinación realista del eje terrestre (~23.5°)
+  earthTilt.add(earth);
+
+  // Agregar el grupo inclinado a la escena
+  scene.add(earthTilt);
+
+  // Guardar referencia global si la necesitas después
+  window.earthTilt = earthTilt;
+
+  scene.traverse(obj => {
+    if (
+      obj.isMesh &&
+      obj.material &&
+      obj.material.map &&
+      obj.material.map.image instanceof HTMLCanvasElement
+    ) {
+      try {
+        earth.attach(obj); // reparent conservando transform global
+        console.log('Attached canvas overlay ->', obj.uuid);
+      } catch (e) {
+        console.warn('Attach failed for', obj.uuid, e);
+      }
+    }
+  });
 
   // Luna
   const moonGeometry = new THREE.SphereGeometry(kmToRenderUnits(1737), 16, 16);
@@ -724,39 +750,31 @@ function initThreeUnified() {
 }
 
 function createEarthTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 256;
-  const ctx = canvas.getContext('2d');
-  
-  // Océanos
-  ctx.fillStyle = '#1a4d7a';
-  ctx.fillRect(0, 0, 512, 256);
-  
-  // Continentes simplificados
-  ctx.fillStyle = '#2d5a2d';
-  // América
-  ctx.fillRect(100, 80, 80, 120);
-  ctx.fillRect(120, 60, 40, 20);
-  // Europa/África
-  ctx.fillRect(240, 70, 60, 100);
-  ctx.fillRect(260, 50, 40, 20);
-  // Asia
-  ctx.fillRect(320, 50, 100, 90);
-  // Australia
-  ctx.fillRect(380, 140, 50, 40);
-  
-  // Nubes
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-  for (let i = 0; i < 30; i++) {
-    const x = Math.random() * 512;
-    const y = Math.random() * 256;
-    ctx.beginPath();
-    ctx.arc(x, y, 10 + Math.random() * 15, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  
-  return new THREE.CanvasTexture(canvas);
+  const textureLoader = new THREE.TextureLoader();
+
+  const earthTexture = textureLoader.load(
+    'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
+    function (texture) {
+      console.log('✅ Textura de la Tierra cargada correctamente');
+      if (typeof earth !== 'undefined' && earth && earth.material) {
+        earth.material.needsUpdate = true;
+      }
+    },
+    undefined,
+    function (err) {
+      console.error('❌ Error al cargar textura:', err);
+    }
+  );
+
+  earthTexture.wrapS = THREE.RepeatWrapping;
+  earthTexture.wrapT = THREE.ClampToEdgeWrapping;
+  earthTexture.minFilter = THREE.LinearFilter;
+  earthTexture.magFilter = THREE.LinearFilter;
+
+  earthTexture.rotation = Math.PI; // 90 grados
+  earthTexture.center.set(0.5, 0.5); // Centro de rotación en el medio de la textura
+
+  return earthTexture;
 }
 
 // Crear textura de la Luna
@@ -1098,29 +1116,29 @@ function animateUnified() {
   
   // Resetear rotación
   earth.rotation.set(0, 0, 0);
-  
-  // Inclinar el eje 23.5° (la inclinación axial respecto al plano orbital)
-  earth.rotation.x = toRad(23.5);
-  
-  // Rotar sobre el eje Z (perpendicular al plano eclíptica XY)
-  earth.rotation.z = earthRotationAngle;
+
+  earth.rotation.x = toRad(-90);
+  //earth.rotation.z = toRad(23.5);
+  earth.rotation.y = -earthRotationAngle;
 
   // Luna orbitando la Tierra con inclinación correcta respecto a la eclíptica
   if (window.moonMesh) {
     const moonAngle = (simulationTime / MOON_ORBITAL_PERIOD) * Math.PI * 2;
     const moonDist = kmToRenderUnits(MOON_DISTANCE);
     
-    // Inclinación de 5.145° respecto al plano eclíptico
-    // El plano de la cuadrícula (eclíptica) es XY después de rotar el GridHelper
+    // La Luna orbita en el plano eclíptico (XY) con 5.145° de inclinación
     const moonInclination = toRad(5.145);
     
-    // Órbita principalmente en el plano XY (la eclíptica visible)
+    // Posición en órbita inclinada respecto a la eclíptica
+    // La inclinación rota el plano orbital alrededor del eje X
     const moonX = Math.cos(moonAngle) * moonDist;
-    const moonY = Math.sin(moonAngle) * moonDist * Math.cos(moonInclination); // Componente principal en el plano
-    const moonZ = Math.sin(moonAngle) * moonDist * Math.sin(moonInclination); // Pequeña inclinación fuera del plano
+    const moonY = Math.sin(moonAngle) * moonDist * Math.cos(moonInclination);
+    const moonZ = Math.sin(moonAngle) * moonDist * Math.sin(moonInclination);
     
     window.moonMesh.position.set(moonX, moonY, moonZ);
-    window.moonMesh.rotation.y = moonAngle; // Rotación sincrónica
+    
+    // Rotación sincrónica (siempre muestra la misma cara a la Tierra)
+    window.moonMesh.rotation.y = moonAngle;
     
     // Actualizar etiqueta de la Luna
     if (window.moonLabel) {
