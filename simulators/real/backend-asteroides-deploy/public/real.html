@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google" content="notranslate">
+  <title>ChaacImpact | Visualizador 3D</title>
+
+  <!-- CesiumJS -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.118/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.118/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Mapa 3D -->
+  <div id="cesiumContainer"></div>
+
+<!-- Botón burger tipo Cesium -->
+<button id="burgerBtn" class="cesium-button burger-toggle" 
+        title="Abrir panel" data-en="Open panel" data-es="Abrir panel">☰</button>
+
+<!-- Panel lateral -->
+<div id="panel">
+  <div class="panel-header">
+    <a href="/index.html" class="titulo">CHAACIMPACT</a>
+  </div>
+
+  <div class="panel-content">
+    <h3 data-en="Impact Simulator" data-es="Simulador de Impactos">Simulador de Impactos</h3>
+    <p data-en="Select an asteroid and a point on the map to start the simulation."
+       data-es="Selecciona un asteroide y un punto del mapa para comenzar la simulación.">
+       Selecciona un asteroide y un punto del mapa para comenzar la simulación.
+    </p>
+
+    <input id="searchAst" type="text"
+           data-en-placeholder="Search asteroid (e.g. Apophis)"
+           data-es-placeholder="Buscar asteroide (ej. Apophis)"
+           placeholder="Buscar asteroide (ej. Apophis)" autocomplete="off">
+    <button id="searchBtn" data-en="Search" data-es="Buscar">Buscar</button>
+
+    <div id="results"></div>
+
+    <div class="info-section">
+      <p><b>🌍 <span data-en="Coordinates:" data-es="Coordenadas:">Coordenadas:</span></b> <span id="coords">–</span></p>
+      <p><b>💠 <span data-en="Diameter:" data-es="Diámetro:">Diámetro:</span></b> <span id="diam">–</span> m</p>
+      <p><b>🚀 <span data-en="Velocity:" data-es="Velocidad:">Velocidad:</span></b> <span id="vel">–</span> km/s</p>
+    </div>
+
+    <button id="simulateBtn" data-en="Simulate Impact" data-es="Simular Impacto">Simular Impacto</button>
+    <button id="verInformeBtn" style="display:none;" data-en="View Report" data-es="Ver Informe">Ver Informe</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="informeModal" style="display: none;">
+  <div class="informe-contenido">
+    <span id="cerrarInforme">✕</span>
+    <h3 id="tituloInforme" data-en="🌎 Impact Report" data-es="🌎 Informe de Impacto">🌎 Informe de Impacto</h3>
+
+    <div id="informeDatos" class="informe-grid">
+      <div class="info-row">
+        <div class="label">
+          <span>🪨</span>
+          <span data-en="Crater:" data-es="Cráter:">Cráter:</span>
+        </div>
+        <div class="value" id="infoCrater">–</div>
+      </div>
+
+      <div class="info-row">
+        <div class="label">
+          <span>📏</span>
+          <span data-en="Depth:" data-es="Profundidad:">Profundidad:</span>
+        </div>
+        <div class="value" id="infoProf">–</div>
+      </div>
+
+      <div class="info-row">
+        <div class="label">
+          <span>🚀</span>
+          <span data-en="Velocity:" data-es="Velocidad:">Velocidad:</span>
+        </div>
+        <div class="value" id="infoVel">–</div>
+      </div>
+
+      <div class="info-row">
+        <div class="label">
+          <span>💥</span>
+          <span data-en="Energy:" data-es="Energía:">Energía:</span>
+        </div>
+        <div class="value" id="infoEnergia">–</div>
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.15); margin: 10px 0;">
+      <p id="infoDescripcion">–</p>
+    </div>
+  </div>
+</div>
+
+
+
+  <!-- Script principal -->
+  <script src="js/main.js"></script>
+
+  <script src="../real/js/lang-sim.js"></script>
+</body>
+</html>
+
