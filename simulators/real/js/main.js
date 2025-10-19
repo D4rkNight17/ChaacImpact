@@ -1,7 +1,6 @@
 // ==========================================================
-// 🌎 ChaacImpact — Simulador 3D Realista SIN BACKEND (versión final)
+// 🌎 ChaacImpact — Simulador 3D Realista SIN BACKEND (versión estable post-refresh)
 // ==========================================================
-
 
 // === Traducciones dinámicas ===
 const LANG_TEXTS = {
@@ -14,6 +13,8 @@ const LANG_TEXTS = {
     localImpact: "Impacto local (daños regionales)",
     continentalImpact: "Impacto continental",
     globalImpact: "Impacto global catastrófico",
+    legendOrange: "Zona de impacto (cráter y fuego)",
+    legendBlue: "Onda expansiva atmosférica",
   },
   en: {
     searchLoading: "Searching asteroids",
@@ -24,6 +25,8 @@ const LANG_TEXTS = {
     localImpact: "Local impact (regional damage)",
     continentalImpact: "Continental impact",
     globalImpact: "Global catastrophic impact",
+    legendOrange: "Impact zone (crater & fire)",
+    legendBlue: "Atmospheric shockwave",
   }
 };
 
@@ -36,37 +39,90 @@ let selectedAsteroid = null;
 let ultimoInforme = null;
 
 // ==========================================================
-// ⚙️ CONFIGURACIÓN VISUAL DE CESIUM
+// ⚙️ CONFIGURACIÓN VISUAL DE CESIUM — Versión segura post-refresh
 // ==========================================================
-Cesium.Ion.defaultAccessToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5NmY5ZDA2Yi0zMzliLTRkOTEtYTYyYS05YTQ0NjQxYzMxNmMiLCJpZCI6MzQ4MzgxLCJpYXQiOjE3NTk5MzI3NDB9.RAB3s6EwdShkIYv8LKHz7SjfB_THmMtcmIvwDC_g3IA";
+function inicializarCesium() {
+  // 🧹 Limpiar contenedor si ya existe
+  const oldContainer = document.getElementById("cesiumContainer");
+  if (oldContainer) oldContainer.innerHTML = "";
+  if (viewer && !viewer.isDestroyed && !viewer.isDestroyed()) viewer.destroy();
 
-viewer = new Cesium.Viewer("cesiumContainer", {
-  terrain: Cesium.Terrain.fromWorldTerrain(),
-  animation: false,
-  timeline: false,
-  navigationHelpButton: false,
-  fullscreenButton: false,
-  baseLayerPicker: false,
-  geocoder: true,
-  homeButton: true,
-  sceneModePicker: true
+  // 🔑 Token de Cesium Ion
+  Cesium.Ion.defaultAccessToken =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5NmY5ZDA2Yi0zMzliLTRkOTEtYTYyYS05YTQ0NjQxYzMxNmMiLCJpZCI6MzQ4MzgxLCJpYXQiOjE3NTk5MzI3NDB9.RAB3s6EwdShkIYv8LKHz7SjfB_THmMtcmIvwDC_g3IA";
+
+  // 🌍 Crear nuevo viewer
+  viewer = new Cesium.Viewer("cesiumContainer", {
+    terrain: Cesium.Terrain.fromWorldTerrain(),
+    animation: false,
+    timeline: false,
+    navigationHelpButton: false,
+    fullscreenButton: false,
+    baseLayerPicker: false,
+    geocoder: true,
+    homeButton: true,
+    sceneModePicker: true,
+  });
+  
+  // 🌎 Ajustes visuales
+  viewer.scene.skyAtmosphere.brightnessShift = 0.5;
+  viewer.scene.skyAtmosphere.hueShift = 0.05;
+  viewer.scene.skyAtmosphere.saturationShift = 0.2;
+  viewer.scene.globe.showGroundAtmosphere = true;
+  viewer.scene.globe.depthTestAgainstTerrain = false;
+
+  viewer.scene.globe.maximumScreenSpaceError = 2;
+  viewer.scene.mapProjection.ellipsoid = Cesium.Ellipsoid.WGS84;
+  viewer.scene.globe.cartographicLimitRectangle =
+    Cesium.Rectangle.fromDegrees(-180, -90, 180, 90);
+
+  console.log("✅ ChaacImpact 3D inicializado correctamente (modo seguro).");
+
+  // ==========================================================
+  // === CAPTURA DE COORDENADAS (seguro tras render) ===
+  // ==========================================================
+  viewer.scene.postRender.addEventListener(() => {
+    if (!window._impactHandlerAdded) {
+      window._impactHandlerAdded = true;
+
+      const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+      handler.setInputAction((e) => {
+        const cartesian = viewer.scene.pickPosition(e.position);
+        if (!cartesian) return;
+
+        const c = Cesium.Cartographic.fromCartesian(cartesian);
+        const lon = Cesium.Math.toDegrees(c.longitude);
+        const lat = Cesium.Math.toDegrees(c.latitude);
+        selectedCoords = { lon, lat };
+
+        viewer.entities.removeAll();
+        viewer.entities.add({
+          position: Cesium.Cartesian3.fromDegrees(lon, lat),
+          point: {
+            pixelSize: 14,
+            color: Cesium.Color.RED,
+            outlineColor: Cesium.Color.WHITE,
+            outlineWidth: 3,
+          },
+          label: {
+            text: LANG_TEXTS[currentLang].impactPoint,
+            fillColor: Cesium.Color.WHITE,
+            pixelOffset: new Cesium.Cartesian2(0, -20),
+          },
+        });
+
+        document.getElementById("coords").innerText =
+          `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
+      }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    }
+  });
+}
+
+
+// 🕓 Esperar a que el DOM cargue antes de inicializar Cesium
+window.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => inicializarCesium(), 100);
 });
-
-// 🌎 Efecto atmosférico sutil
-viewer.scene.skyAtmosphere.brightnessShift = 0.5;
-viewer.scene.skyAtmosphere.hueShift = 0.05;
-viewer.scene.skyAtmosphere.saturationShift = 0.2;
-viewer.scene.globe.showGroundAtmosphere = true;
-
-
-viewer.scene.globe.depthTestAgainstTerrain = false;
-console.log("✅ ChaacImpact 3D inicializado sin backend.");
-
-// Limitar vista 2D y evitar scroll infinito
-viewer.scene.globe.maximumScreenSpaceError = 2;
-viewer.scene.mapProjection.ellipsoid = Cesium.Ellipsoid.WGS84;
-viewer.scene.globe.cartographicLimitRectangle = Cesium.Rectangle.fromDegrees(-180, -90, 180, 90);
 
 // ==========================================================
 // 🍔 BOTÓN HAMBURGUESA
@@ -104,7 +160,7 @@ async function buscarAsteroides(nombre) {
   const barra = document.createElement("div");
   barra.style.height = "4px";
   barra.style.width = "0%";
-  barra.style.background = "#00b4ff";
+  barra.style.background = "#8A9AA5";
   barra.style.transition = "width 0.3s ease";
   cont.appendChild(barra);
 
@@ -172,33 +228,23 @@ function seleccionarAsteroide(a) {
   console.log(`🪐 Asteroide seleccionado: ${a.name}`);
 }
 
+// === Buscar con botón ===
 document.getElementById("searchBtn").onclick = async () => {
   const nombre = document.getElementById("searchAst").value.trim();
   if (!nombre) return alert(LANG_TEXTS[currentLang].selectBoth);
   await buscarAsteroides(nombre);
 };
 
-// ==========================================================
-// === CAPTURA DE COORDENADAS ===
-// ==========================================================
-const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
-handler.setInputAction((e) => {
-  const cartesian = viewer.scene.pickPosition(e.position);
-  if (!cartesian) return;
-  const c = Cesium.Cartographic.fromCartesian(cartesian);
-  const lon = Cesium.Math.toDegrees(c.longitude);
-  const lat = Cesium.Math.toDegrees(c.latitude);
-  selectedCoords = { lon, lat };
+// === Buscar también con Enter ===
+document.getElementById("searchAst").addEventListener("keydown", async (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault(); // evita recargar la página
+    const nombre = e.target.value.trim();
+    if (!nombre) return alert(LANG_TEXTS[currentLang].selectBoth);
+    await buscarAsteroides(nombre);
+  }
+});
 
-  viewer.entities.removeAll();
-  viewer.entities.add({
-    position: Cesium.Cartesian3.fromDegrees(lon, lat),
-    point: { pixelSize: 14, color: Cesium.Color.RED, outlineColor: Cesium.Color.WHITE, outlineWidth: 3 },
-    label: { text: LANG_TEXTS[currentLang].impactPoint, fillColor: Cesium.Color.WHITE, pixelOffset: new Cesium.Cartesian2(0, -20) }
-  });
-
-  document.getElementById("coords").innerText = `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
-}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
 // ==========================================================
 // === SIMULAR IMPACTO ===
@@ -324,36 +370,101 @@ document.getElementById("simulateBtn").onclick = async () => {
 };
 
 // ==========================================================
-// === ANIMACIÓN VISUAL + ONDA EXPANSIVA AZUL ===
+// === ANIMACIÓN DEL ASTEROIDE CON FUEGO + CÁMARA CINEMÁTICA ===
 // ==========================================================
 function animarImpacto(coords, D_f_m, E_Mt, R_e_m) {
-  const startHeight = 1800000;
-  const spacePos = Cesium.Cartesian3.fromDegrees(coords.lon, coords.lat, startHeight);
+  const startHeight = 8000000; // 8,000 km — visible desde el espacio
   const impactPos = Cesium.Cartesian3.fromDegrees(coords.lon, coords.lat, 0);
-  console.log("🌍 Coordenadas impacto:", coords.lat, coords.lon);
 
+  // Desplazamiento inicial para que entre en DIAGONAL (desde Noroeste hacia el punto)
+  const lonOffset0 = 6.0;   // grados al Oeste
+  const latOffset0 = 3.0;   // grados al Norte
+
+  // 🌠 Asteroide con textura de fuego
   const asteroid = viewer.entities.add({
-    position: spacePos,
-    point: { pixelSize: 10, color: Cesium.Color.YELLOW }
+    name: "asteroid",
+    position: Cesium.Cartesian3.fromDegrees(coords.lon - lonOffset0, coords.lat + latOffset0, startHeight),
+    billboard: {
+      image: crearTexturaFuego(),
+      scale: 0.75,
+      color: Cesium.Color.ORANGE.withAlpha(0.95),
+      verticalOrigin: Cesium.VerticalOrigin.CENTER,
+      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+    },
   });
 
-  const duration = 4000, start = performance.now();
+  const duration = 4000; // 4 s de caída
+  const start = performance.now();
+  const trailParticles = [];
+
   function anim(now) {
     const t = Math.min((now - start) / duration, 1);
-    asteroid.position = Cesium.Cartesian3.fromDegrees(coords.lon, coords.lat, startHeight * (1 - t));
-    if (t < 1) requestAnimationFrame(anim);
-    else {
+
+    // Trayectoria DIAGONAL + descenso acelerado
+    const lon = coords.lon - lonOffset0 * (1 - t);
+    const lat = coords.lat + latOffset0 * (1 - t);
+    const height = startHeight * (1 - Math.pow(t, 1.1));
+
+    const currentPos = Cesium.Cartesian3.fromDegrees(lon, lat, height);
+    asteroid.position = currentPos;
+
+    // 🔥 Cola de fuego dinámica
+    if (Math.random() < 0.65) {
+      const particle = viewer.entities.add({
+        position: currentPos,
+        point: {
+          pixelSize: 8 + Math.random() * 4,
+          color: Cesium.Color.fromCssColorString(
+            `rgba(255, ${100 + Math.random() * 100}, 0, 0.85)`
+          ),
+        },
+      });
+      trailParticles.push({ entity: particle, life: 1.0 });
+    }
+
+    // 💨 Desvanecer partículas viejas
+    for (let i = trailParticles.length - 1; i >= 0; i--) {
+      const p = trailParticles[i];
+      p.life -= 0.04;
+      if (p.life <= 0) {
+        viewer.entities.remove(p.entity);
+        trailParticles.splice(i, 1);
+      } else {
+        p.entity.point.color = Cesium.Color.fromCssColorString(
+          `rgba(255, ${80 + p.life * 175}, 0, ${p.life * 0.8})`
+        );
+      }
+    }
+
+    if (t < 1) {
+      requestAnimationFrame(anim);
+    } else {
+      // 💫 Mini vibración previa al impacto
+      shakePantalla(500);
+
       viewer.entities.remove(asteroid);
+      trailParticles.forEach(p => viewer.entities.remove(p.entity));
       mostrarExplosion(impactPos, D_f_m, E_Mt, R_e_m);
     }
   }
+
   requestAnimationFrame(anim);
 }
 
 // ==========================================================
-// === EXPLOSIÓN PRINCIPAL (Flash + Anillo + Onda Azul) ===
+// === EXPLOSIÓN PRINCIPAL (Flash + Sacudida + Onda Azul original) ===
 // ==========================================================
 function mostrarExplosion(impactPos, crater_km, E_Mt, R_e) {
+  // 💥 Impactos globales = flash total blanco + sacudida 3s
+  if (E_Mt >= 1e6) {
+    flashAtmosferico(2000);
+    shakePantalla(2000);
+  } else {
+    // 💨 Impactos locales o continentales = flash breve
+    flashAtmosferico(800);
+  }
+
+  // 🔵 Tu onda expansiva azul y cráter original
   const craterMetros = crater_km;
   const maxCrater = craterMetros * 2;
   const elevacion = Math.max(5000, craterMetros * 0.1);
@@ -363,21 +474,6 @@ function mostrarExplosion(impactPos, crater_km, E_Mt, R_e) {
   const ondaExpansiva_m = R_ref_m * Math.cbrt(Math.max(E_Mt, 1e-6) / E_ref_Mt);
   const waveSize = Math.max(10000, ondaExpansiva_m);
 
-  console.log("💥 Tamaños de explosión:", { crater_km, flashSize, ringSize, waveSize });
-
-  // Desvanecimiento del flash
-  let flashOpacity = 0.9;
-  const fade = setInterval(() => {
-    flashOpacity -= 0.05;
-    if (flashOpacity <= 0) {
-      clearInterval(fade);
-      viewer.entities.remove(flash);
-    } else {
-      flash.ellipse.material = Cesium.Color.WHITE.withAlpha(flashOpacity);
-    }
-  }, 80);
-
-  // === ANILLO NARANJA (cráter y fuego) ===
   const ring = viewer.entities.add({
     position: impactPos,
     ellipse: {
@@ -390,7 +486,6 @@ function mostrarExplosion(impactPos, crater_km, E_Mt, R_e) {
     }
   });
 
-  // === ONDA EXPANSIVA AZUL ===
   const wave = viewer.entities.add({
     position: impactPos,
     ellipse: {
@@ -405,29 +500,73 @@ function mostrarExplosion(impactPos, crater_km, E_Mt, R_e) {
     }
   });
 
-  // Expansión del anillo naranjado
   let size = ringSize;
   function expand() {
     size += maxCrater / 120;
     ring.ellipse.semiMajorAxis = size;
     ring.ellipse.semiMinorAxis = size;
-    if (size < maxCrater) {
-      requestAnimationFrame(expand);
-    } else {
-      setTimeout(() => mostrarCrater(impactPos, crater_km), 1000);
-    }
+    if (size < maxCrater) requestAnimationFrame(expand);
+    else setTimeout(() => mostrarCrater(impactPos, crater_km), 1000);
   }
   setTimeout(() => expand(), 1500);
+
+  mostrarLeyendaImpacto();
 }
 
 // ==========================================================
-// === CRÁTER FINAL ===
+// === EFECTOS VISUALES (Flash + Sacudida + Textura de fuego) ===
 // ==========================================================
-function mostrarCrater(impactPos, crater_km) {
-  viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(selectedCoords.lon, selectedCoords.lat, crater_km * 50),
-    duration: 3
-  });
+function flashAtmosferico(duracionMs = 900) {
+  const overlay = document.createElement('div');
+  overlay.className = 'flash-overlay';
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('on'));
+  setTimeout(() => overlay.classList.remove('on'), duracionMs * 0.7);
+  setTimeout(() => overlay.remove(), duracionMs + 300);
+}
+
+function shakePantalla(duration = 3000) {
+  document.body.classList.add('shake');
+  setTimeout(() => document.body.classList.remove('shake'), duration);
+}
+
+function crearTexturaFuego() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 64;
+  canvas.height = 64;
+  const ctx = canvas.getContext("2d");
+  const grad = ctx.createRadialGradient(32, 32, 5, 32, 32, 30);
+  grad.addColorStop(0, "rgba(255,255,200,1)");
+  grad.addColorStop(0.25, "rgba(255,220,100,0.95)");
+  grad.addColorStop(0.55, "rgba(255,140,0,0.8)");
+  grad.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 64, 64);
+  return canvas;
+}
+
+// ==========================================================
+// 🟠🔵 LEYENDA VISUAL TRADUCIBLE
+// ==========================================================
+function mostrarLeyendaImpacto() {
+  const old = document.querySelector(".impact-legend");
+  if (old) old.remove();
+
+  const legend = document.createElement("div");
+  legend.className = "impact-legend";
+  legend.innerHTML = `
+    <div><span class="legend-dot orange"></span> ${LANG_TEXTS[currentLang].legendOrange}</div>
+    <div><span class="legend-dot blue"></span> ${LANG_TEXTS[currentLang].legendBlue}</div>
+  `;
+  document.body.appendChild(legend);
+
+  legend.style.opacity = "0";
+  setTimeout(() => (legend.style.opacity = "1"), 300);
+  setTimeout(() => {
+    legend.style.transition = "opacity 2s ease";
+    legend.style.opacity = "0";
+    setTimeout(() => legend.remove(), 2500);
+  }, 8000);
 }
 
 // ==========================================================

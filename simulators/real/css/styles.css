@@ -414,3 +414,59 @@ button:active {
 .titulo:hover {
   opacity: 0.8;
 }
+
+/* ⚡ Flash atmosférico */
+.flash-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 9999; /* 🔥 Muy importante */
+  pointer-events: none;
+}
+
+.flash-overlay.on {
+  opacity: 1;
+}
+
+/*Info de impacto y su onda expansiva*/
+.impact-legend {
+  position: fixed;
+  bottom: 8px;              
+  right: 8px;               
+  background: rgba(10, 10, 10, 0.8);
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;          
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  transition: opacity 0.6s ease;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.legend-dot.orange {
+  background: orange;
+  box-shadow: 0 0 8px 2px rgba(255,165,0,0.6);
+}
+
+.legend-dot.blue {
+  background: #009dff;
+  box-shadow: 0 0 8px 2px rgba(0,157,255,0.6);
+}
+
