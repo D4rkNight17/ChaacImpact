@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>☄️ Calculadora de Mitigación de Asteroides NEO</title>
+<title data-es="☄️ Calculadora de Mitigación de Asteroides NEO" data-en="☄️ NEO Asteroid Mitigation Calculator">☄️ Calculadora de Mitigación de Asteroides NEO</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="app-container">
     <!-- HEADER -->
     <header class="app-header">
-      <h1>☄️ Calculadora de Mitigación de Asteroides NEO</h1>
-      <p class="subtitle">Sistema de visualización 3D y análisis de estrategias de deflexión</p>
-      <button onclick="restartTutorial()" class="btn btn-secondary" style="margin-top: 30px;">Tutorial</button>
+      <h1 data-es="Calculadora de Mitigación de Asteroides" data-en="Asteroid Mitigation Calculator">Calculadora de Mitigación de Asteroides</h1>
+      <p class="subtitle" data-es="Sistema de visualización 3D y análisis de estrategias de deflexión" data-en="3D visualization system and deflection strategy analysis">Sistema de visualización 3D y análisis de estrategias de deflexión</p>
+      <button onclick="restartTutorial()" class="btn btn-secondary" style="margin-top: 30px;" data-es="Tutorial" data-en="Tutorial">Tutorial</button>
     </header>
 
     <!-- MAIN CONTENT -->
@@ -21,36 +21,36 @@
       <aside class="sidebar sidebar-left">
         <!-- Búsqueda de Asteroides -->
         <section class="card">
-          <h2 class="card-title">🔍 Buscar Asteroide</h2>
+          <h2 class="card-title" data-es="🔍 Buscar Asteroide" data-en="🔍 Search Asteroid">🔍 Buscar Asteroide</h2>
           <div class="form-group">
-            <label for="searchQuery">Nombre, fragmento o ID</label>
-            <input id="searchQuery" type="text" placeholder="ej: Apophis, Bennu, 433" />
+            <label for="searchQuery" data-es="Nombre, fragmento o ID" data-en="Name, fragment or ID">Nombre, fragmento o ID</label>
+            <input id="searchQuery" type="text" data-es-placeholder="ej: Apophis, Bennu, 433" data-en-placeholder="e.g., Apophis, Bennu, 433" placeholder="ej: Apophis, Bennu, 433" />
           </div>
           <div class="button-group">
-            <button id="searchBtn" class="btn btn-primary">🔎 Buscar</button>
-            <button id="clearBtn" class="btn btn-danger">🗑️ Limpiar</button>
+            <button id="searchBtn" class="btn btn-primary" data-es="🔎 Buscar" data-en="🔎 Search">🔎 Buscar</button>
+            <button id="clearBtn" class="btn btn-danger" data-es="🗑️ Limpiar" data-en="🗑️ Clear">🗑️ Limpiar</button>
           </div>
           <div class="form-group">
-            <label for="neoSelect">📋 Resultados (doble clic)</label>
+            <label for="neoSelect" data-es="📋 Resultados (doble clic)" data-en="📋 Results (double-click)">📋 Resultados (doble clic)</label>
             <select id="neoSelect" size="6" class="neo-select"></select>
           </div>
-          <button id="loadDetailBtn" class="btn btn-secondary btn-block">📥 Cargar</button>
+          <button id="loadDetailBtn" class="btn btn-secondary btn-block" data-es="📥 Cargar" data-en="📥 Load">📥 Cargar</button>
         </section>
 
         <!-- Información del Asteroide -->
         <section class="card">
-          <h2 class="card-title">📊 Asteroide</h2>
+          <h2 class="card-title" data-es="📊 Asteroide" data-en="📊 Asteroid">📊 Asteroide</h2>
           <div id="asteroidDetails" class="asteroid-info">
-            <em class="text-muted">Ninguno</em>
+            <em class="text-muted" data-es="Ninguno" data-en="None">Ninguno</em>
           </div>
         </section>
 
         <!-- Distancias -->
         <section class="card">
-          <h2 class="card-title">📏 Distancias</h2>
+          <h2 class="card-title" data-es="📏 Distancias" data-en="📏 Distances">📏 Distancias</h2>
           <div class="info-box">
-            <div id="minDistanceInfo" class="info-item"><strong>Mínima:</strong> N/A</div>
-            <div id="currentDistance" class="info-item"><strong>Actual:</strong> Esperando...</div>
+            <div id="minDistanceInfo" class="info-item"><strong data-es="Mínima:" data-en="Minimum:">Mínima:</strong> N/A</div>
+            <div id="currentDistance" class="info-item"><strong data-es="Actual:" data-en="Current:">Actual:</strong> Esperando...</div>
           </div>
         </section>
       </aside>
@@ -60,26 +60,26 @@
         <div class="viz-container">
           <canvas id="canvas3d"></canvas>
           <div id="gameTimer" class="game-timer"></div>
-          <div class="viz-overlay" id="vizInfo">Selecciona un asteroide y calcula estrategias</div>
+          <div class="viz-overlay" id="vizInfo" data-es="Selecciona un asteroide y calcula estrategias" data-en="Select an asteroid and calculate strategies">Selecciona un asteroide y calcula estrategias</div>
         </div>
 
         <!-- Controles -->
         <section class="controls-bar">
           <div class="control-group">
-            <button id="playPauseBtn" class="btn btn-control">⏸️ Pause</button>
-            <button id="resetSimBtn" class="btn btn-control">🔄 Reset</button>
+            <button id="playPauseBtn" class="btn btn-control" data-es="⏸️ Pausa" data-en="⏸️ Pause">⏸️ Pausa</button>
+            <button id="resetSimBtn" class="btn btn-control" data-es="🔄 Reiniciar" data-en="🔄 Reset">🔄 Reiniciar</button>
           </div>
         </section>
 
         <!-- Leyenda -->
         <section class="legend-box">
-          <div class="legend-title">📖 Leyenda</div>
+          <div class="legend-title" data-es="📖 Leyenda" data-en="📖 Legend">📖 Leyenda</div>
           <div class="legend-items">
-            <div class="legend-item"><div class="legend-swatch orbit-original"></div><span>Órbita original</span></div>
-            <div class="legend-item"><div class="legend-swatch orbit-modified"></div><span>Órbita desviada</span></div>
-            <div class="legend-item"><div class="legend-swatch marker-asteroid"></div><span>Asteroide</span></div>
-            <div class="legend-item"><div class="legend-swatch marker-earth"></div><span>Tierra</span></div>
-            <div class="legend-item"><div class="legend-swatch marker-encounter"></div><span>Encuentro</span></div>
+            <div class="legend-item"><div class="legend-swatch orbit-original"></div><span data-es="Órbita original" data-en="Original orbit">Órbita original</span></div>
+            <div class="legend-item"><div class="legend-swatch orbit-modified"></div><span data-es="Órbita desviada" data-en="Deflected orbit">Órbita desviada</span></div>
+            <div class="legend-item"><div class="legend-swatch marker-asteroid"></div><span data-es="Asteroide" data-en="Asteroid">Asteroide</span></div>
+            <div class="legend-item"><div class="legend-swatch marker-earth"></div><span data-es="Tierra" data-en="Earth">Tierra</span></div>
+            <div class="legend-item"><div class="legend-swatch marker-encounter"></div><span data-es="Encuentro" data-en="Encounter">Encuentro</span></div>
           </div>
         </section>
 
@@ -91,65 +91,61 @@
 
       <!-- RIGHT SIDEBAR -->
       <aside class="sidebar sidebar-right">
-        <!-- Modo Juego - MOVIDO ARRIBA -->
+        <!-- Modo Juego -->
         <section class="card card-game-enhanced">
           <div class="game-header">
-            <h2 class="card-title">🚨 DEFENSA PLANETARIA</h2>
+            <h2 class="card-title" data-es="🚨 DEFENSA PLANETARIA" data-en="🚨 PLANETARY DEFENSE">🚨 DEFENSA PLANETARIA</h2>
             <button onclick="showInfoPanel('game')" class="btn-info">ℹ️</button>
           </div>
-          <div class="game-description">
-            ¡Modo desafío! Simulación de asteroide en curso de colisión
-          </div>
+          <div class="game-description" data-es="¡Modo desafío! Simulación de asteroide en curso de colisión" data-en="Challenge mode! Simulating asteroid on collision course">¡Modo desafío! Simulación de asteroide en curso de colisión</div>
           <div class="form-group">
-            <label for="gameDaysInput">
+            <label for="gameDaysInput" data-es="Días hasta impacto:" data-en="Days until impact:">
               Días hasta impacto:
               <button onclick="showInfoPanel('days')" class="btn-info-inline">ℹ️</button>
             </label>
             <input id="gameDaysInput" type="number" value="180" min="30" max="365" step="30" />
           </div>
-          <button id="startGameBtn" class="btn btn-danger btn-block btn-pulse">
-            <span class="btn-icon">🚨</span> INICIAR AMENAZA
-          </button>
+          <button id="startGameBtn" class="btn btn-danger btn-block btn-pulse" data-es="🚨 INICIAR AMENAZA" data-en="🚨 START THREAT"><span class="btn-icon">🚨</span> INICIAR AMENAZA</button>
         </section>
 
-        <!-- Parámetros - MEJORADO -->
+        <!-- Parámetros -->
         <section class="card">
           <div class="section-header">
-            <h2 class="card-title">🎯 Misión</h2>
+            <h2 class="card-title" data-es="🎯 Misión" data-en="🎯 Mission">🎯 Misión</h2>
             <button onclick="showInfoPanel('mission')" class="btn-info">ℹ️</button>
           </div>
           <div class="form-group">
-            <label for="warningTime">
+            <label for="warningTime" data-es="⏱️ Tiempo de Advertencia (años)" data-en="⏱️ Warning Time (years)">
               ⏱️ Tiempo de Advertencia (años)
               <button onclick="showInfoPanel('warning')" class="btn-info-inline">ℹ️</button>
             </label>
             <input id="warningTime" type="number" value="10" min="0.1" step="0.1" />
           </div>
-          <button id="calcBtn" class="btn btn-primary btn-block btn-large">
+          <button id="calcBtn" class="btn btn-primary btn-block btn-large" data-es="🚀 CALCULAR ESTRATEGIAS" data-en="🚀 CALCULATE STRATEGIES">
             <span class="btn-icon">🚀</span> CALCULAR ESTRATEGIAS
             <button onclick="showInfoPanel('calculate'); event.stopPropagation();" class="btn-info-inline" style="margin-left: 8px;">ℹ️</button>
           </button>
           <div class="info-box">
-            <div class="info-title">📈 Resumen</div>
-            <div id="resultsSummary" class="info-content">Sin resultados</div>
+            <div class="info-title" data-es="📈 Resumen" data-en="📈 Summary">📈 Resumen</div>
+            <div id="resultsSummary" class="info-content" data-es="Sin resultados" data-en="No results">Sin resultados</div>
           </div>
         </section>
 
-        <!-- Configuración - MEJORADO -->
+        <!-- Configuración -->
         <section class="card">
           <div class="section-header">
-            <h2 class="card-title">🎨 Renderizado</h2>
+            <h2 class="card-title" data-es="🎨 Renderizado" data-en="🎨 Rendering">🎨 Renderizado</h2>
             <button onclick="showInfoPanel('rendering')" class="btn-info">ℹ️</button>
           </div>
           <div class="form-group">
-            <label for="segmentsSlider">
+            <label for="segmentsSlider" data-es="Segmentos:" data-en="Segments:">
               Segmentos: <span id="segmentsLabel" class="value-label">256</span>
               <button onclick="showInfoPanel('segments')" class="btn-info-inline">ℹ️</button>
             </label>
             <input type="range" id="segmentsSlider" min="64" max="512" value="256" step="64" class="slider">
           </div>
           <div class="form-group">
-            <label for="samplesSlider">
+            <label for="samplesSlider" data-es="Muestras:" data-en="Samples:">
               Muestras: <span id="samplesLabel" class="value-label">1500</span>
               <button onclick="showInfoPanel('samples')" class="btn-info-inline">ℹ️</button>
             </label>
@@ -161,7 +157,7 @@
 
     <!-- RESULTS -->
     <section class="results-section">
-      <h2 class="section-title">🛡️ Estrategias de Mitigación</h2>
+      <h2 class="section-title" data-es="🛡️ Estrategias de Mitigación" data-en="🛡️ Mitigation Strategies">🛡️ Estrategias de Mitigación</h2>
       <div id="resultsGrid" class="results-grid"></div>
     </section>
   </div>
@@ -176,21 +172,21 @@
   <div id="tutorialDialog" class="tutorial-dialog" style="display: none;">
     <div class="tutorial-title">
       <span id="tutorialIcon">⚡</span>
-      <span id="tutorialTitleText">¡Bienvenido!</span>
+      <span id="tutorialTitleText" data-es="¡Bienvenido!" data-en="Welcome!">¡Bienvenido!</span>
     </div>
-    <div class="tutorial-content" id="tutorialContentText">Cargando tutorial...</div>
+    <div class="tutorial-content" id="tutorialContentText" data-es="Cargando tutorial..." data-en="Loading tutorial...">Cargando tutorial...</div>
     <div class="tutorial-controls">
-      <span class="tutorial-progress" id="tutorialProgress">1 / 8</span>
-      <button class="tutorial-btn tutorial-btn-skip" id="tutorialSkip">Saltar</button>
-      <button class="tutorial-btn tutorial-btn-secondary" id="tutorialPrev" style="display: none;">← Anterior</button>
-      <button class="tutorial-btn" id="tutorialNext">Siguiente →</button>
+      <span class="tutorial-progress" id="tutorialProgress" data-es="1 / 8" data-en="1 / 8">1 / 8</span>
+      <button class="tutorial-btn tutorial-btn-skip" id="tutorialSkip" data-es="Saltar" data-en="Skip">Saltar</button>
+      <button class="tutorial-btn tutorial-btn-secondary" id="tutorialPrev" style="display: none;" data-es="← Anterior" data-en="← Previous">← Anterior</button>
+      <button class="tutorial-btn" id="tutorialNext" data-es="Siguiente →" data-en="Next →">Siguiente →</button>
     </div>
   </div>
 
   <!-- PANEL DE INFORMACIÓN -->
   <div id="infoPanel" class="info-panel" style="display: none;">
     <div class="info-panel-content">
-      <button onclick="closeInfoPanel()" class="info-panel-close">✕</button>
+      <button onclick="closeInfoPanel()" class="info-panel-close" data-es="✕" data-en="✕">✕</button>
       <h3 id="infoPanelTitle"></h3>
       <p id="infoPanelText"></p>
     </div>
@@ -201,5 +197,7 @@
   <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
   <script src="script.js"></script>
+  <script src="lang-sim.js"></script>
 </body>
 </html>
+

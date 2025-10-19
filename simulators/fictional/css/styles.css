@@ -1,0 +1,530 @@
+/* ========================================================= */
+/* 🌌 CHAACIMPACT — Theme: Night Steel                       */
+/* ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Rajdhani:wght@500;700&display=swap');
+
+html, body, #cesiumContainer {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: radial-gradient(circle at 25% 20%, #0B141B 0%, #111E2D 100%);
+  font-family: 'Inter', sans-serif;
+  color: #CDD0CF;
+}
+
+body {
+  animation: bodyFade 0.5s ease-out;
+}
+
+@keyframes bodyFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ========================================================= */
+/* PANEL LATERAL                                              */
+/* ========================================================= */
+#panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 100%;
+  background: #111E2D;
+  backdrop-filter: blur(12px);
+  border-right: 1px solid rgba(44, 60, 79, 0.7);
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.45);
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: transform 0.3s ease;
+  z-index: 9998;
+}
+
+#panel.hidden {
+  transform: translateX(-310px);
+}
+
+#panel::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
+/* ========================================================= */
+/* HEADER                                                     */
+/* ========================================================= */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(90deg, #0B141B 0%, #0B141B 100%);
+  border-bottom: 1px solid rgba(73, 90, 108, 0.6);
+  padding: 14px 0;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-family: 'Rajdhani', sans-serif;
+  color: #CDD0CF;
+  text-shadow: 0 0 8px rgba(141, 165, 175, 0.4);
+  box-sizing: border-box;
+}
+
+/* ========================================================= */
+/* BOTÓN BURGER                                               */
+/* ========================================================= */
+/* === Burger exclusivo === */
+.burger-toggle {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #101c24;
+  border: 1px solid rgba(73, 90, 108, 0.6);
+  border-radius: 4px;
+  color: #CDD0CF;
+  cursor: pointer;
+  z-index: 10000;
+  transition: background-color 0.25s, box-shadow 0.25s;
+}
+
+.burger-toggle:hover {
+  background-color: #0B141B;
+}
+
+.burger-toggle:active {
+  background-color: rgba(17, 30, 45, 0.9);
+}
+
+
+/* ========================================================= */
+/* CONTENIDO DEL PANEL                                        */
+/* ========================================================= */
+.panel-content {
+  padding: 18px;
+}
+.panel-content h3 {
+  color: #CDD0CF;
+  text-align: center;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.panel-content p {
+  color: #8A9AA5;
+  font-size: 13px;
+  padding: 7px;
+}
+
+/* ========================================================= */
+/* INPUTS Y BOTONES                                           */
+/* ========================================================= */
+input {
+  width: 91%;
+  padding: 10px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(73, 90, 108, 0.7);
+  background: rgba(27, 36, 48, 0.9);
+  color: #CDD0CF;
+  font-size: 13px;
+  outline: none;
+  margin-bottom: 8px;
+  transition: border 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  letter-spacing: 0.3px;
+}
+
+input:focus {
+  border-color: #8A9AA5;
+  box-shadow: 0 0 8px rgba(205, 208, 207, 0.25);
+  background: rgba(33, 44, 57, 0.95);
+}
+
+input::placeholder {
+  color: rgba(205, 208, 207, 0.4);
+}
+
+button {
+  margin-top: 4px;
+  width: 100%;
+  padding: 9px 0;
+  background: linear-gradient(90deg, #2C3C4F, #495A6C);
+  border: none;
+  border-radius: 6px;
+  color: #CDD0CF;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 12px rgba(205, 208, 207, 0.25);
+}
+
+#verInformeBtn {
+  margin-top: 7px;
+}
+
+/* ========================================================= */
+/* 💡 Autocompletado coherente con tema Night Steel          */
+/* ========================================================= */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px #1B2430 inset !important; /* Fondo oscuro */
+  -webkit-text-fill-color: #CDD0CF !important; /* Texto gris claro */
+  border: 1px solid rgba(73, 90, 108, 0.7) !important; /* Borde acorde */
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+
+/* ========================================================= */
+/* INFO SECTIONS                                              */
+/* ========================================================= */
+.info-section {
+  margin-top: 16px;
+  border-top: 1px solid rgba(73, 90, 108, 0.3);
+  padding-top: 12px;
+  font-size: 13px;
+  line-height: 1.4em;
+  color: #8A9AA5;
+}
+.info-section b {
+  color: #CDD0CF;
+}
+
+/* ========================================================= */
+/* MODAL DE INFORME                                           */
+/* ========================================================= */
+#informeModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(11, 20, 27, 0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.4s ease;
+}
+
+.informe-contenido {
+  background: rgba(17, 30, 45, 0.97);
+  color: #CDD0CF;
+  border-radius: 14px;
+  padding: 22px 24px;
+  width: 310px;
+  box-shadow: 0 0 20px rgba(73, 90, 108, 0.2);
+  border: 1px solid rgba(73, 90, 108, 0.4);
+  backdrop-filter: blur(10px);
+  transition: 0.4s;
+}
+
+#tituloInforme {
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 16.5px;
+  font-weight: 700;
+  color: #CDD0CF;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+#cerrarInforme {
+  position: absolute;
+  top: 6px;
+  right: 12px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #8A9AA5;
+  transition: 0.2s;
+}
+#cerrarInforme:hover {
+  color: #CDD0CF;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px 0;
+  padding: 3px 0;
+  font-size: 13.5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.info-row .label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #8A9AA5;
+  font-weight: 500;
+}
+.info-row .value {
+  color: #CDD0CF;
+  font-weight: 600;
+  text-align: right;
+}
+
+#infoDescripcion {
+  margin-top: 10px;
+  font-style: italic;
+  color: #8A9AA5;
+  text-align: justify;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* ========================================================= */
+/* COLORES DE NIVEL                                           */
+/* ========================================================= */
+.nivel-verde { color: #00C78E; }
+.nivel-naranja { color: #D87436; }
+.nivel-rojo { color: #FF5F5F; }
+
+/* ========================================================= */
+/* RESULTADOS DE ASTEROIDES                                   */
+/* ========================================================= */
+#results {
+  margin-top: 10px;
+  font-size: 13.5px;
+  color: #CDD0CF;
+  background: rgba(17, 30, 45, 0.8);
+  border-radius: 8px;
+  border: 1px solid rgba(73, 90, 108, 0.5);
+  padding: 8px 10px;
+  max-height: 130px;
+  overflow-y: auto;
+  box-shadow: inset 0 0 6px rgba(73, 90, 108, 0.25);
+  display: none;
+}
+
+.asteroid-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.asteroid-item:hover {
+  background: rgba(73, 90, 108, 0.25);
+  transform: translateX(4px);
+}
+.asteroid-icon {
+  font-size: 16px;
+  color: #8A9AA5;
+  flex-shrink: 0;
+}
+
+/* ========================================================= */
+/* OCULTAR CREDITOS CESIUM                                   */
+/* ========================================================= */
+.cesium-viewer-bottom,
+.cesium-viewer-cesiumWidgetContainer .cesium-credit-logoContainer,
+.cesium-credit-textContainer {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ========================================================= */
+/* 🔵 ANIMACIÓN “BUSCANDO ASTEROIDES…”                       */
+/* ========================================================= */
+.search-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+  color: #8A9AA5;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+.search-loading .loader {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(73, 90, 108, 0.4);
+  border-top: 2px solid #CDD0CF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 6px;
+}
+.search-loading .dots {
+  display: inline-block;
+  animation: dots 1.4s steps(4, end) infinite;
+  margin-left: 2px;
+}
+@keyframes dots {
+  0%, 20% { color: transparent; text-shadow: .25em 0 transparent, .5em 0 transparent; }
+  40% { color: #CDD0CF; text-shadow: .25em 0 transparent, .5em 0 transparent; }
+  60% { color: #CDD0CF; text-shadow: .25em 0 #CDD0CF, .5em 0 transparent; }
+  80%, 100% { color: #CDD0CF; text-shadow: .25em 0 #CDD0CF, .5em 0 #CDD0CF; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 🌌 Botones con efecto táctil realista */
+button {
+  background: linear-gradient(90deg, #2C3C4F, #495A6C);
+  border: none;
+  color: #CDD0CF;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.25s ease;
+}
+
+button:hover {
+  background: linear-gradient(90deg, #495A6C, #8A9AA5);
+  transform: scale(1.03);
+  box-shadow: 0 0 10px rgba(205, 208, 207, 0.25);
+  color: #FFFFFF;
+}
+
+button:active {
+  transform: scale(.95);
+  box-shadow: 0 0 4px rgba(205, 208, 207, 0.15);
+}
+
+/*Regresar al home*/
+.titulo {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.titulo:hover {
+  opacity: 0.8;
+}
+
+/* ⚡ Flash atmosférico */
+.flash-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 9999; /* 🔥 Muy importante */
+  pointer-events: none;
+}
+
+.flash-overlay.on {
+  opacity: 1;
+}
+
+/*Info de impacto y su onda expansiva*/
+.impact-legend {
+  position: fixed;
+  bottom: 8px;              
+  right: 8px;               
+  background: rgba(10, 10, 10, 0.8);
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;          
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  transition: opacity 0.6s ease;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.legend-dot.orange {
+  background: orange;
+  box-shadow: 0 0 8px 2px rgba(255,165,0,0.6);
+}
+
+.legend-dot.blue {
+  background: #009dff;
+  box-shadow: 0 0 8px 2px rgba(0,157,255,0.6);
+}
+
+/* ========================================================= */
+/* 🎚️ Sliders estilo Night Steel (ChaacImpact real)          */
+/* ========================================================= */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 92%;
+  height: 7px;
+  border-radius: 10px;
+  background: rgba(44, 60, 79, 0.4);
+  outline: none;
+  margin: 8px 0 14px;
+  cursor: pointer;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.6),
+              0 0 2px rgba(205,208,207,0.15);
+}
+
+/* Parte “rellena” del slider */
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 7px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #2C3C4F 0%, #495A6C 70%, #8A9AA5 100%);
+  border: 1px solid rgba(73,90,108,0.4);
+}
+
+/* Perilla (thumb) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #CDD0CF 0%, #8A9AA5 80%);
+  border: 1px solid rgba(255,255,255,0.4);
+  box-shadow: 0 0 6px rgba(205,208,207,0.5);
+  margin-top: -4px; /* centra verticalmente */
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(205,208,207,0.7);
+}
+
+
+/* ========================================================= */
+/* 🌍 Coordenadas estilizadas                                */
+/* ========================================================= */
+.coords-label {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #8A9AA5;
+  text-align: center;
+  letter-spacing: 0.3px;
+  font-family: 'Inter', sans-serif;
+}
+.coords-label b {
+  color: #CDD0CF;
+  font-weight: 600;
+}

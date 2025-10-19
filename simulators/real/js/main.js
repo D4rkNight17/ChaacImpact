@@ -15,6 +15,8 @@ const LANG_TEXTS = {
     globalImpact: "Impacto global catastrófico",
     legendOrange: "Zona de impacto (cráter y fuego)",
     legendBlue: "Onda expansiva atmosférica",
+    simulateBtn: "Simular impacto",
+    loadingTerrain: "Cargando terreno..."
   },
   en: {
     searchLoading: "Searching asteroids",
@@ -27,6 +29,8 @@ const LANG_TEXTS = {
     globalImpact: "Global catastrophic impact",
     legendOrange: "Impact zone (crater & fire)",
     legendBlue: "Atmospheric shockwave",
+    simulateBtn: "Simulate impact",
+    loadingTerrain: "Loading terrain..."
   }
 };
 
@@ -39,19 +43,25 @@ let selectedAsteroid = null;
 let ultimoInforme = null;
 
 // ==========================================================
-// ⚙️ CONFIGURACIÓN VISUAL DE CESIUM — Versión segura post-refresh
+// ⚙️ INICIALIZACIÓN CESIUM — versión ultra estable
 // ==========================================================
-function inicializarCesium() {
-  // 🧹 Limpiar contenedor si ya existe
-  const oldContainer = document.getElementById("cesiumContainer");
-  if (oldContainer) oldContainer.innerHTML = "";
-  if (viewer && !viewer.isDestroyed && !viewer.isDestroyed()) viewer.destroy();
+async function inicializarCesium() {
+  const container = document.getElementById("cesiumContainer");
+  if (!container) {
+    console.error("❌ No se encontró el contenedor Cesium.");
+    return;
+  }
 
-  // 🔑 Token de Cesium Ion
+  // Si existe un viewer previo, lo destruimos
+  if (viewer && !viewer.isDestroyed()) {
+    viewer.destroy();
+  }
+
+  // Token de Cesium Ion
   Cesium.Ion.defaultAccessToken =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5NmY5ZDA2Yi0zMzliLTRkOTEtYTYyYS05YTQ0NjQxYzMxNmMiLCJpZCI6MzQ4MzgxLCJpYXQiOjE3NTk5MzI3NDB9.RAB3s6EwdShkIYv8LKHz7SjfB_THmMtcmIvwDC_g3IA";
 
-  // 🌍 Crear nuevo viewer
+  // Crear el viewer
   viewer = new Cesium.Viewer("cesiumContainer", {
     terrain: Cesium.Terrain.fromWorldTerrain(),
     animation: false,
@@ -63,66 +73,77 @@ function inicializarCesium() {
     homeButton: true,
     sceneModePicker: true,
   });
-  
-  // 🌎 Ajustes visuales
+
+  // Precarga de terreno para evitar arrays vacíos
+  viewer.scene.globe.preloadSiblings = true;
+  viewer.scene.globe.preloadAncestors = true;
+  viewer.scene.globe.maximumScreenSpaceError = 1;
+
+  // Ajustes visuales
   viewer.scene.skyAtmosphere.brightnessShift = 0.5;
   viewer.scene.skyAtmosphere.hueShift = 0.05;
   viewer.scene.skyAtmosphere.saturationShift = 0.2;
   viewer.scene.globe.showGroundAtmosphere = true;
   viewer.scene.globe.depthTestAgainstTerrain = false;
-
-  viewer.scene.globe.maximumScreenSpaceError = 2;
   viewer.scene.mapProjection.ellipsoid = Cesium.Ellipsoid.WGS84;
-  viewer.scene.globe.cartographicLimitRectangle =
-    Cesium.Rectangle.fromDegrees(-180, -90, 180, 90);
 
-  console.log("✅ ChaacImpact 3D inicializado correctamente (modo seguro).");
+  // Botón de simular (bloqueado hasta que todo esté listo)
+  const simulateBtn = document.getElementById("simulateBtn");
+  simulateBtn.disabled = true;
+  simulateBtn.textContent = LANG_TEXTS[currentLang].loadingTerrain;
 
-  // ==========================================================
-  // === CAPTURA DE COORDENADAS (seguro tras render) ===
-  // ==========================================================
-  viewer.scene.postRender.addEventListener(() => {
-    if (!window._impactHandlerAdded) {
-      window._impactHandlerAdded = true;
+  try {
+    // Esperar a que el terreno y la escena estén listos
+    await viewer.scene.globe.readyPromise;
+    await viewer.terrainProvider.readyPromise;
 
-      const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
-      handler.setInputAction((e) => {
-        const cartesian = viewer.scene.pickPosition(e.position);
-        if (!cartesian) return;
+    console.log("✅ Cesium y terreno cargados completamente");
 
-        const c = Cesium.Cartographic.fromCartesian(cartesian);
-        const lon = Cesium.Math.toDegrees(c.longitude);
-        const lat = Cesium.Math.toDegrees(c.latitude);
-        selectedCoords = { lon, lat };
+    // Habilitar simulación cuando todo esté OK
+    simulateBtn.disabled = false;
+    simulateBtn.textContent = LANG_TEXTS[currentLang].simulateBtn;
+  } catch (err) {
+    console.error("⚠️ Error al inicializar Cesium:", err);
+    simulateBtn.disabled = false;
+    simulateBtn.textContent = LANG_TEXTS[currentLang].simulateBtn;
+  }
 
-        viewer.entities.removeAll();
-        viewer.entities.add({
-          position: Cesium.Cartesian3.fromDegrees(lon, lat),
-          point: {
-            pixelSize: 14,
-            color: Cesium.Color.RED,
-            outlineColor: Cesium.Color.WHITE,
-            outlineWidth: 3,
-          },
-          label: {
-            text: LANG_TEXTS[currentLang].impactPoint,
-            fillColor: Cesium.Color.WHITE,
-            pixelOffset: new Cesium.Cartesian2(0, -20),
-          },
-        });
+  // === CAPTURA DE COORDENADAS ===
+  const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  handler.setInputAction((e) => {
+    const cartesian = viewer.scene.pickPosition(e.position);
+    if (!cartesian) return;
 
-        document.getElementById("coords").innerText =
-          `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
-      }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-    }
-  });
+    const c = Cesium.Cartographic.fromCartesian(cartesian);
+    const lon = Cesium.Math.toDegrees(c.longitude);
+    const lat = Cesium.Math.toDegrees(c.latitude);
+    selectedCoords = { lon, lat };
+
+    viewer.entities.removeAll();
+    viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(lon, lat),
+      point: {
+        pixelSize: 14,
+        color: Cesium.Color.RED,
+        outlineColor: Cesium.Color.WHITE,
+        outlineWidth: 3,
+      },
+      label: {
+        text: LANG_TEXTS[currentLang].impactPoint,
+        fillColor: Cesium.Color.WHITE,
+        pixelOffset: new Cesium.Cartesian2(0, -20),
+      },
+    });
+
+    document.getElementById("coords").innerText = `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
 
-
-// 🕓 Esperar a que el DOM cargue antes de inicializar Cesium
+// === Esperar a que cargue todo el DOM ===
 window.addEventListener("DOMContentLoaded", () => {
-  setTimeout(() => inicializarCesium(), 100);
+  setTimeout(() => inicializarCesium(), 200);
 });
+
 
 // ==========================================================
 // 🍔 BOTÓN HAMBURGUESA
@@ -247,26 +268,72 @@ document.getElementById("searchAst").addEventListener("keydown", async (e) => {
 
 
 // ==========================================================
-// === SIMULAR IMPACTO ===
+// === SIMULAR IMPACTO (versión segura) ===
 // ==========================================================
 document.getElementById("simulateBtn").onclick = async () => {
   if (!selectedCoords || !selectedAsteroid)
     return alert(LANG_TEXTS[currentLang].selectBoth);
 
-  const diam = parseFloat(selectedAsteroid.estimated_diameter.meters.estimated_diameter_max || 100);
-  const vel = parseFloat(selectedAsteroid.close_approach_data?.[0]?.relative_velocity?.kilometers_per_second || 20);
+  const diam = parseFloat(
+    selectedAsteroid.estimated_diameter.meters.estimated_diameter_max || 100
+  );
+  const vel = parseFloat(
+    selectedAsteroid.close_approach_data?.[0]?.relative_velocity
+      ?.kilometers_per_second || 20
+  );
   const densidad = 3000;
   const angulo = 45;
 
-  const carto = Cesium.Cartographic.fromDegrees(selectedCoords.lon, selectedCoords.lat);
-  const [sample] = await Cesium.sampleTerrainMostDetailed(viewer.terrainProvider, [carto]);
-  const altura = sample?.height ?? 0;
+  const carto = Cesium.Cartographic.fromDegrees(
+    selectedCoords.lon,
+    selectedCoords.lat
+  );
 
-  const { rho_t, tipo } = densidadTerrenoPorAltura(altura, selectedCoords.lat, selectedCoords.lon);
+  // 🧱 --- bloque seguro de terreno ---
+  let altura = 0;
+  try {
+    await viewer.terrainProvider.readyPromise; // espera provider listo
+    const samples = await Cesium.sampleTerrainMostDetailed(
+      viewer.terrainProvider,
+      [carto]
+    );
+    if (
+      Array.isArray(samples) &&
+      samples.length > 0 &&
+      isFinite(samples[0].height)
+    ) {
+      altura = samples[0].height;
+    } else {
+      console.warn(
+        "⚠️ Cesium devolvió alturas inválidas. Usando altura 0 por seguridad."
+      );
+    }
+  } catch (err) {
+    console.error("⚠️ Error obteniendo altura del terreno:", err);
+    altura = 0; // valor de respaldo seguro
+  }
+  // -----------------------------------
+
+  const { rho_t, tipo } = densidadTerrenoPorAltura(
+    altura,
+    selectedCoords.lat,
+    selectedCoords.lon
+  );
   const masa = masaImpactor(diam, densidad);
   const { E, E_Mt } = energiaImpacto(masa, vel);
   const { D_f, R_e } = craterYEyecta(diam, vel, densidad, rho_t, angulo);
   const efectos = calcularEfectosSecundarios(E, D_f, vel, tipo, R_e);
+
+  console.log("📊 Parámetros del impacto:", {
+    diam,
+    vel,
+    densidad,
+    angulo,
+    altura,
+    rho_t,
+    tipo,
+  });
+  console.log("💥 Resultados físicos:", { masa, E_Mt, D_f, R_e, efectos });
 
   generarInformeDesastres(E_Mt, D_f, R_e, tipo);
   animarImpacto(selectedCoords, D_f, E_Mt, R_e);

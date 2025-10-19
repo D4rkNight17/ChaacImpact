@@ -1,0 +1,153 @@
+:root {
+  --color1: #0B141B;
+  --color2: #111E2D;
+  --color3: #2C3C4F;
+  --color4: #495A6C;
+  --color5: #8A9AA5;
+  --color6: #CDD0CF;
+}
+
+body {
+  overflow: hidden;
+}
+
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: black;
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.scene {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 🌍 Tierra */
+.earth {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) scale(1);
+  width: 280px;
+  opacity: 0.95;
+  z-index: 2;
+  animation: earthShake 0.4s ease-in-out 2.2s, earthFade 0.5s ease-out 2.8s forwards;
+}
+
+/* ☄️ Asteroide */
+.asteroid {
+  position: absolute;
+  top: -200px;
+  right: -200px;
+  width: 150px;
+  transform: rotate(25deg);
+  z-index: 3;
+  animation: asteroidFall 2s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+}
+
+/* 💥 Explosión */
+.explosion {
+  position: absolute;
+  bottom: 120px;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  transform: translateX(-50%) scale(0);
+  background: radial-gradient(circle, rgba(255,230,150,1) 0%, rgba(255,120,0,0.9) 40%, rgba(0,0,0,0) 70%);
+  border-radius: 50%;
+  opacity: 0;
+  z-index: 4;
+  animation: explosionExpand 0.8s ease-out 2s forwards;
+}
+
+/* ✨ Flash */
+.flash {
+  position: absolute;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  z-index: 5;
+  animation: flashImpact 0.4s ease-in-out 2.1s;
+}
+
+/* 🚀 Logo */
+.logo-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  z-index: 10;
+  animation: showLogo 1.2s ease-in-out 3s forwards;
+}
+
+.logo {
+  width: 160px;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 25px var(--color3));
+}
+
+.logo-container h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3rem;
+  color: var(--color6);
+  letter-spacing: 6px;
+  text-shadow: 0 0 25px var(--color3), 0 0 45px var(--color4);
+  animation: glowPulse 2s ease-in-out infinite alternate;
+}
+
+/* === ANIMACIONES === */
+
+/* Asteroide rápido y directo */
+@keyframes asteroidFall {
+  0% { transform: translate(0, 0) rotate(25deg) scale(1); opacity: 1; }
+  70% { transform: translate(-46vw, 60vh) rotate(40deg) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50vw, 80vh) rotate(60deg) scale(0.9); opacity: 0; }
+}
+
+/* Explosión */
+@keyframes explosionExpand {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.2); }
+  40% { opacity: 1; transform: translateX(-50%) scale(3); }
+  100% { opacity: 0; transform: translateX(-50%) scale(5); }
+}
+
+/* Flash */
+@keyframes flashImpact {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+/* Vibración leve */
+@keyframes earthShake {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  25% { transform: translate(-48%, 1%) scale(1.03); }
+  50% { transform: translate(-52%, -1%) scale(1.02); }
+}
+
+/* Tierra desaparece */
+@keyframes earthFade {
+  to { opacity: 0; transform: translateX(-50%) scale(0.7); }
+}
+
+/* Logo */
+@keyframes showLogo {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Glow */
+@keyframes glowPulse {
+  from { text-shadow: 0 0 25px var(--color3), 0 0 50px var(--color4); }
+  to { text-shadow: 0 0 35px var(--color5), 0 0 70px var(--color6); }
+}

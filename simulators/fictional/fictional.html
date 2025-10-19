@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google" content="notranslate">
+  <title>ChaacImpact | Simulador Ficticio</title>
+
+  <!-- CesiumJS -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.120/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.120/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Mapa 3D -->
+  <div id="cesiumContainer"></div>
+
+  <!-- Botón burger -->
+  <button id="burgerBtn" class="cesium-button burger-toggle"
+          title="Abrir panel" data-en="Open panel" data-es="Abrir panel">☰</button>
+
+  <!-- Panel lateral -->
+  <div id="panel">
+    <div class="panel-header">
+      <a href="/index.html" class="titulo">CHAACIMPACT</a>
+    </div>
+
+    <div class="panel-content">
+      <h3 data-en="Fictional Impact Simulator" data-es="Simulador Ficticio de Impactos">
+        Simulador Ficticio de Impactos
+      </h3>
+
+      <p data-en="Adjust the asteroid parameters and click on the globe to set the impact point. The simulation applies real physical equations."
+         data-es="Ajusta los parámetros del asteroide y haz clic en el globo para establecer el punto de impacto. La simulación aplica ecuaciones físicas reales.">
+         Ajusta los parámetros del asteroide y haz clic en el globo para establecer el punto de impacto. La simulación aplica ecuaciones físicas reales.
+      </p>
+
+      <!-- Sliders -->
+      <div class="info-section">
+        <label>☄️ <span data-en="Diameter (m):" data-es="Diámetro (m):">Diámetro (m):</span></label>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span id="valDiam">1000</span>
+        </div>
+        <input type="range" id="diamRange" min="10" max="30000" value="1000">
+
+        <label>🚀 <span data-en="Velocity (km/s):" data-es="Velocidad (km/s):">Velocidad (km/s):</span></label>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span id="valVel">20</span>
+        </div>
+        <input type="range" id="velRange" min="1" max="50" value="20">
+
+        <label>⚙️ <span data-en="Density (kg/m³):" data-es="Densidad (kg/m³):">Densidad (kg/m³):</span></label>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span id="valDens">3000</span>
+        </div>
+        <input type="range" id="densRange" min="500" max="6000" value="3000">
+      </div>
+
+      <p class="coords-label">
+        <b>🌍 <span data-en="Coordinates:" data-es="Coordenadas:">Coordenadas:</span></b>
+        <span id="coords">–</span>
+      </p>
+
+      <button id="simulateBtn" data-en="Simulate Impact" data-es="Simular Impacto">Simular Impacto</button>
+      <button id="verInformeBtn" style="display:none;" data-en="View Report" data-es="Ver Informe">Ver Informe</button>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="informeModal" style="display: none;">
+    <div class="informe-contenido">
+      <span id="cerrarInforme">✕</span>
+      <h3 id="tituloInforme" data-en="🌎 Impact Report" data-es="🌎 Informe de Impacto">
+        🌎 Informe de Impacto
+      </h3>
+
+      <div id="informeDatos" class="informe-grid">
+        <div class="info-row">
+          <div class="label">
+            <span>🪨</span>
+            <span data-en="Crater:" data-es="Cráter:">Cráter:</span>
+          </div>
+          <div class="value" id="infoCrater">–</div>
+        </div>
+
+        <div class="info-row">
+          <div class="label">
+            <span>💥</span>
+            <span data-en="Energy:" data-es="Energía:">Energía:</span>
+          </div>
+          <div class="value" id="infoEnergia">–</div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.15); margin: 10px 0;">
+        <p id="infoDescripcion">–</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  <script src="../real/js/lang-sim.js"></script>
+
+</body>
+</html>
+
+

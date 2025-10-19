@@ -338,3 +338,30 @@ footer p {
   opacity: 1;
   transform: translateY(0);
 }
+
+#simulators,
+#game {
+  scroll-margin-top: 90px; /* ajusta según el alto real de tu navbar */
+}
+
+/* ✨ Glow atmosférico global */
+.global-glow {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,200,0,0.3), rgba(255,100,0,0.1), rgba(0,0,0,0.8));
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+/* 💥 Sacudida */
+.shake {
+  animation: shakeAnim 0.5s ease-in-out infinite;
+}
+@keyframes shakeAnim {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(3px, -3px); }
+  50% { transform: translate(-3px, 3px); }
+  75% { transform: translate(2px, -2px); }
+}

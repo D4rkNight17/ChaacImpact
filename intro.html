@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
+<meta name="google" content="notranslate">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cinemática de Impacto</title>
-  <link rel="stylesheet" href="/css/intro.css">
+  <title>ChaacImpact Intro</title>
+  <link rel="stylesheet" href="intro/intro.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="scene">
-    <img src="assets/tierra.png" alt="Tierra" class="earth">
-    <img src="assets/asteroide.png" alt="Asteroide" class="asteroid">
+    <img src="assets/asteroide.png" alt="Asteroid" class="asteroid">
+    <img src="assets/tierra.png" alt="Earth" class="earth">
+    <div class="explosion"></div>
     <div class="flash"></div>
+    <div class="logo-container">
+      <img src="assets/icons/logo.png" alt="Logo" class="logo">
+      <h1>CHAACIMPACT</h1>
+    </div>
   </div>
-
-  <script>
-    // ⏱️ Al terminar la animación, redirige a la página real
-    setTimeout(() => {
-      window.location.href = "index.html";
-    }, 4000); // 4 segundos
-  </script>
+  <script src="intro/intro.js"></script>
 </body>
 </html>
