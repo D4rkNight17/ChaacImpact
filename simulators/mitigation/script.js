@@ -7,9 +7,9 @@ const NASA_API_KEY = 'Nxvxz1N0ARXVVH9oNBdI8uQXtZiF9pLTdhIxD29B';
 const NASA_BASE = 'https://api.nasa.gov/neo/rest/v1';
 const EARTH_RADIUS = 6.371e6;
 const EARTH_RADIUS_KM = 6371;
-const EARTH_ROTATION_PERIOD = 86400; // 24 horas en segundos
-const MOON_ORBITAL_PERIOD = 27.3 * 86400; // 27.3 días
-const MOON_DISTANCE = 384400; // km desde la Tierra
+const EARTH_ROTATION_PERIOD = 86400;
+const MOON_ORBITAL_PERIOD = 27.3 * 86400;
+const MOON_DISTANCE = 384400;
 
 const SCALE_OPTIONS = {
   '1k': { km: 1e3, label: '1,000 km/unidad' },
@@ -39,8 +39,6 @@ let asteroids = [], selectedAsteroid = null, currentResults = null, selectedStra
 let scene, camera, renderer, controls, animationId, earth, asteroidMesh;
 let originalOrbitLine, newOrbitLine, currentNewOrbit, sunSprite, sunGlow;
 let asteroidMarker, earthMarker, earthOrbitAroundSun, earthPositionMarker;
-
-// Modo juego
 let gameMode = false, gameTimeLimit = 0, gameTimeRemaining = 0, gameOver = false, gameWon = false, originalAsteroidOrbit = null;
 
 /* -------------------- UTILIDADES -------------------- */
@@ -75,7 +73,7 @@ const fmtSmart = (value, unit) => {
   return fmt(value, unit, 2);
 };
 
-/* -------------------- API NASA -------------------- */
+/* -------------------- API NASA + CHAACIMPACT -------------------- */
 async function fetchFromNASA(pathOrId) {
   try {
     const url = /^\d+$/.test(String(pathOrId)) || !String(pathOrId).startsWith('/')
@@ -83,8 +81,7 @@ async function fetchFromNASA(pathOrId) {
       : `${NASA_BASE}${pathOrId}${pathOrId.includes('?') ? '&' : '?'}api_key=${NASA_API_KEY}`;
     
     const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-    
-    const resp = await fetch(proxyUrl); // Cambiar fetch(url) por fetch(proxyUrl)
+    const resp = await fetch(proxyUrl);
     return resp.ok ? await resp.json() : null;
   } catch (err) {
     console.error('fetchFromNASA error:', err);
@@ -92,104 +89,70 @@ async function fetchFromNASA(pathOrId) {
   }
 }
 
+/* === 🔹 Carga de NEOs (Base de datos + NASA) === */
 async function loadNeos(query = '') {
   const select = document.getElementById('neoSelect');
   if (!select) return;
   
   select.disabled = true;
-  select.innerHTML = '<option>Buscando en NASA NEOs...</option>';
+  select.innerHTML = '<option>Buscando asteroides...</option>';
   
   const q = query.trim().toLowerCase();
   const results = [];
 
   try {
-    // Mapeo de nombres famosos a SPK-ID completos
-    const famousAsteroids = {
-      'apophis': '2099942',
-      'bennu': '2101955',
-      'ryugu': '2162173',
-      'didymos': '2065803',
-      'eros': '2000433',
-      'itokawa': '2025143',
-      'geographos': '2001620',
-      'toutatis': '2004179',
-      'phaethon': '2003200'
-    };
+    // === 1️⃣ Consultar primero la base de datos ChaacImpact ===
+    try {
+      const urlDB = 'https://uinik.com.mx/simulators/real/backend/get_asteroids.php';
+      const resDB = await fetch(urlDB);
+      const dataDB = await resDB.json();
 
-    // Si es un número puro, intentar como SPK-ID directo
-    if (/^\d+$/.test(q)) {
-      // Primero intentar el ID tal cual
-      let data = await fetchFromNASA(q);
-      
-      // Si falla y no tiene prefijo de siglo, intentar con prefijo 20
-      if (!data && q.length <= 6) {
-        data = await fetchFromNASA('20' + q);
-      }
-      
-      if (data) {
-        const diameter = data.estimated_diameter?.meters
-          ? (data.estimated_diameter.meters.estimated_diameter_min + data.estimated_diameter.meters.estimated_diameter_max) / 2
-          : null;
-        results.push({ id: data.neo_reference_id || data.id, name: data.name, diameter_m: diameter });
-      }
-    }
-    
-    // Si es un nombre y coincide con asteroides famosos
-    if (famousAsteroids[q]) {
-      const data = await fetchFromNASA(famousAsteroids[q]);
-      if (data) {
-        const diameter = data.estimated_diameter?.meters
-          ? (data.estimated_diameter.meters.estimated_diameter_min + data.estimated_diameter.meters.estimated_diameter_max) / 2
-          : null;
-        results.push({ id: data.neo_reference_id || data.id, name: data.name, diameter_m: diameter });
-      }
-    }
-    
-    // Búsqueda en el catálogo browse
-    if (results.length === 0 || q.length === 0) {
-      const pagesToSearch = q.length >= 3 ? 5 : 2;
-      
-      for (let page = 0; page < pagesToSearch; page++) {
-        const resp = await fetchFromNASA(`/neo/browse?page=${page}&size=20`);
-        if (resp?.near_earth_objects) {
-          resp.near_earth_objects
-            .filter(n => {
-              if (!q) return true;
-              const name = (n.name || '').toLowerCase();
-              const designation = (n.designation || '').toLowerCase();
-              return name.includes(q) || designation.includes(q);
-            })
-            .forEach(n => {
-              if (!results.find(r => r.id === n.neo_reference_id)) {
-                const diameter = n.estimated_diameter?.meters
-                  ? (n.estimated_diameter.meters.estimated_diameter_min + n.estimated_diameter.meters.estimated_diameter_max) / 2
-                  : null;
-                results.push({ 
-                  id: n.neo_reference_id || n.id, 
-                  name: n.name, 
-                  diameter_m: diameter 
-                });
-              }
-            });
+      if (dataDB.status === 'success' && Array.isArray(dataDB.data)) {
+        const encontrados = dataDB.data.filter(a => 
+          !q || (a.name && a.name.toLowerCase().includes(q))
+        ).map(a => ({
+          id: a.nasa_id || a.id,
+          name: a.name,
+          diameter_m: parseFloat(a.diameter) || null
+        }));
+
+        if (encontrados.length > 0) {
+          results.push(...encontrados);
+          console.log(`✅ ${encontrados.length} asteroides cargados desde base de datos`);
         }
-        
-        if (results.length >= 20) break;
+      }
+    } catch (dbErr) {
+      console.warn('⚠️ No se pudo conectar con la base de datos:', dbErr);
+    }
+
+    // === 2️⃣ Si no hay resultados, buscar en NASA ===
+    if (results.length === 0) {
+      const famousAsteroids = {
+        'apophis': '2099942', 'bennu': '2101955', 'ryugu': '2162173',
+        'didymos': '2065803', 'eros': '2000433', 'itokawa': '2025143',
+        'geographos': '2001620', 'toutatis': '2004179', 'phaethon': '2003200'
+      };
+
+      if (famousAsteroids[q]) {
+        const data = await fetchFromNASA(famousAsteroids[q]);
+        if (data) {
+          const diameter = data.estimated_diameter?.meters
+            ? (data.estimated_diameter.meters.estimated_diameter_min + data.estimated_diameter.meters.estimated_diameter_max) / 2
+            : null;
+          results.push({ id: data.neo_reference_id || data.id, name: data.name, diameter_m: diameter });
+        }
       }
     }
 
-    results.sort((a, b) => a.name.length - b.name.length);
-
+    results.sort((a, b) => a.name.localeCompare(b.name));
     asteroids = results;
     select.innerHTML = asteroids.length === 0 
-      ? '<option disabled>No se encontraron resultados. Intenta: Apophis, 433, Bennu</option>'
+      ? '<option disabled>No se encontraron resultados. Intenta Apophis, Bennu, etc.</option>'
       : asteroids.map(n => `<option value="${n.id}">${n.name}${n.diameter_m ? ` • ${Math.round(n.diameter_m)} m` : ''}</option>`).join('');
     
-    if (asteroids.length > 0) {
-      console.log(`✅ Encontrados ${asteroids.length} asteroides`);
-    }
   } catch (err) {
     console.error('loadNeos error:', err);
-    select.innerHTML = '<option disabled>Error al consultar NASA</option>';
+    select.innerHTML = '<option disabled>Error al cargar asteroides</option>';
   } finally {
     select.disabled = false;
   }
@@ -2167,3 +2130,4 @@ document.addEventListener('keydown', (e) => {
 // Exportar para uso global
 window.showInfoPanel = showInfoPanel;
 window.closeInfoPanel = closeInfoPanel;
+

@@ -50,6 +50,7 @@
 
     <button id="simulateBtn" data-en="Simulate Impact" data-es="Simular Impacto">Simular Impacto</button>
     <button id="verInformeBtn" style="display:none;" data-en="View Report" data-es="Ver Informe">Ver Informe</button>
+    <button id="resetBtn" data-en="Reset Simulation" data-es="Reiniciar Simulación">Reiniciar Simulación</button>
   </div>
 </div>
 
@@ -99,11 +100,15 @@
 </div>
 
 
-
   <!-- Script principal -->
   <script src="js/main.js"></script>
 
   <script src="../real/js/lang-sim.js"></script>
+
+  <!-- Escala visual -->
+  <div id="escalaContainer" class="escala-overlay">
+    Escala visual: 1 cm ≈ 100 km
+  </div>
 </body>
 </html>
 

@@ -436,7 +436,7 @@ button:active {
 /*Info de impacto y su onda expansiva*/
 .impact-legend {
   position: fixed;
-  bottom: 8px;              
+  bottom: 50px;              
   right: 8px;               
   background: rgba(10, 10, 10, 0.8);
   color: white;
@@ -470,3 +470,38 @@ button:active {
   box-shadow: 0 0 8px 2px rgba(0,157,255,0.6);
 }
 
+.escala-overlay {
+  position: absolute;
+  bottom: 15px;
+  right: 20px;
+  background: rgba(17, 30, 45, 0.8);
+  color: #cdd0cf;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  font-family: "Orbitron", sans-serif;
+  transition: all 0.4s ease;
+}
+
+#resetBtn {
+  background: linear-gradient(90deg, #2C3C4F, #495A6C);
+  color: #CDD0CF;
+  border: none;
+  border-radius: 6px;
+  width: 100%;
+  padding: 9px 0;
+  margin-top: 7px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+#resetBtn:hover {
+  background: linear-gradient(90deg, #495A6C, #8A9AA5);
+  transform: scale(1.03);
+  box-shadow: 0 0 10px rgba(205, 208, 207, 0.25);
+  color: #FFFFFF;
+}
